@@ -74,9 +74,9 @@
 			(subtractmaskfromsilk no)
 			(outputformat 1)
 			(mirror no)
-			(drillshape 1)
+			(drillshape 0)
 			(scaleselection 1)
-			(outputdirectory "")
+			(outputdirectory "gerber/")
 		)
 	)
 	(net 0 "")
@@ -2551,7 +2551,7 @@
 		)
 		(fp_arc
 			(start 29.787185 7.39953)
-			(mid 29.726968 7.443575)
+			(mid 29.726964 7.443532)
 			(end 29.653015 7.433617)
 			(stroke
 				(width 0.12)
@@ -2628,7 +2628,7 @@
 		)
 		(fp_arc
 			(start 13.181636 16.183218)
-			(mid 13.252316 16.21252)
+			(mid 13.252352 16.212514)
 			(end 13.281638 16.283216)
 			(stroke
 				(width 0.12)
@@ -2639,7 +2639,7 @@
 		)
 		(fp_arc
 			(start 21.815219 15.27141)
-			(mid 21.0674 12.435796)
+			(mid 21.067398 12.435796)
 			(end 21.815217 9.600183)
 			(stroke
 				(width 0.12)
@@ -2661,7 +2661,7 @@
 		)
 		(fp_arc
 			(start 9.581638 18.683217)
-			(mid 9.510896 18.653941)
+			(mid 9.510932 18.653935)
 			(end 9.481636 18.583215)
 			(stroke
 				(width 0.12)
@@ -2716,7 +2716,7 @@
 		)
 		(fp_arc
 			(start 23.84761 17.47206)
-			(mid 23.907851 17.428039)
+			(mid 23.907847 17.427995)
 			(end 23.981784 17.437975)
 			(stroke
 				(width 0.12)
@@ -6894,7 +6894,7 @@
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=7.62mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 7.62mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
 		(property "Reference" "R9"
-			(at 3.81 -2.37 360)
+			(at 3.81 -2.37 0)
 			(layer "F.SilkS")
 			(uuid "b03c1c6d-788a-4371-9da3-b2819683c60a")
 			(effects
@@ -6905,7 +6905,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 3.81 2.37 360)
+			(at 3.81 2.37 0)
 			(layer "F.Fab")
 			(uuid "105da3cc-1b98-4712-8aec-3a91a0376859")
 			(effects
@@ -7120,7 +7120,7 @@
 			(uuid "c950dd1c-fe45-4daf-9c20-9b62d78ebc5b")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 3.81 0 360)
+			(at 3.81 0 0)
 			(layer "F.Fab")
 			(uuid "41c74d3e-964c-401a-9091-58ed789a15b8")
 			(effects

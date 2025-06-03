@@ -85,6 +85,7 @@ description: "Development log for a VR-controlled robotic arm project"
 - Created Journal.md
 - Finished BOM
 - TODO:
+  - Add Camera to BOM
   - Finalize camera mounting solution
   - Start coding base functionality
   - Start coding VR → Arm Pose in Unity

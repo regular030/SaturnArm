@@ -4,13 +4,13 @@ author: "Kunshpreet"
 description: "Development log for a VR-controlled robotic arm project"
 ---
 
-**Total time spent thus far: 66h**
+**Total time spent thus far: 53h**
 
 # May 25-26: Initial Concept and Design
 - Created idea
 - Pitched concept
 - Developed rough Bill of Materials (BOM)
-- **Total time spent: 17h**
+- **Total time spent: 4h**
 
 # May 26-28: Arm Assembly and Design Refinements
 - Finished first part of the arm

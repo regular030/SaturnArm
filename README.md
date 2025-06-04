@@ -33,7 +33,9 @@
   - top
     - All 3D files for the top part of the arm
 - Kicad
-  - All PCB files for KiCad 8.0.5    
+  - All PCB files for KiCad 8.0.5
+- Firmware
+  - All the Firmware files for the pi zero 2 w
       
 <ul> </ul>
 

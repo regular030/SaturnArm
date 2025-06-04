@@ -2,6 +2,7 @@
   
   # SaturnArm - A Simple Robotic Arm Controlled by VR Hand Tracking
 </p>
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/6ea7d9c7-e56b-4559-b11c-992ef261172b" style="width:400px; height:auto;">
   <img src="https://github.com/user-attachments/assets/7ea0fa0f-be51-418e-8ee4-44945cf4e20b" style="width:330px; height:auto;">
@@ -12,10 +13,10 @@
   BOM: https://docs.google.com/spreadsheets/d/1lf9XG99qlgez3aRTxvFln9WQ-VlTF8MQk1fM6mLnBtQ/edit?usp=sharing
   <img src="https://github.com/user-attachments/assets/9d0f2b97-2f82-48d6-8008-f292809102d8" style="width:600px; height:auto;">
 </p>
-
-# Usage 
-<p align="center">
-
+    
+<h2> Why did I Build This?</h2>
+<p>
+  While watching a NASA Mars rover in action on YouTube, I noticed how every function, including the robotic arm, was controlled through a computer interface. It made me wonder, why not use virtual reality instead, to make the experience more immersive and intuitive?
 </p>
 
 # Files 
@@ -47,5 +48,4 @@ Coming soon (ish)
 #  TODO
 
 - Finalize camera mounting solution
-- Start coding base functionality
 - Start coding VR → Arm Pose in Unity

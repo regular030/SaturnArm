@@ -23,8 +23,15 @@
   - middle
     - All 3D files for the middle part of the arm    
   - top
-    - All 3D files for the top part of the arm    
+    - All 3D files for the top part of the arm
+- Kicad
+  - All PCB files for KiCad 8.0.5    
       
+<ul> </ul>
+
+#  Instructions 
+Coming soon (ish)
+
 <ul> </ul>
 
 #  TODO

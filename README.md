@@ -16,7 +16,6 @@
 # Usage 
 <p align="center">
 
-<img src="https://github.com/user-attachments/assets/92d4a8b8-731d-4baf-8b3a-b66f5c03b713" style="width:600px; height:auto;">
 </p>
 
 # Files 

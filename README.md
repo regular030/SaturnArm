@@ -1,4 +1,7 @@
-# SaturnArm - A Simple Robotic Arm Controlled by VR Hand Tracking
+<p align="center">
+  
+  # SaturnArm - A Simple Robotic Arm Controlled by VR Hand Tracking
+</p>
 <p align="center">
   <img src="https://github.com/user-attachments/assets/6ea7d9c7-e56b-4559-b11c-992ef261172b" style="width:400px; height:auto;">
   <img src="https://github.com/user-attachments/assets/7ea0fa0f-be51-418e-8ee4-44945cf4e20b" style="width:330px; height:auto;">

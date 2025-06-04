@@ -10,7 +10,7 @@
   <ul>
 <p align="center">
   BOM: https://docs.google.com/spreadsheets/d/1lf9XG99qlgez3aRTxvFln9WQ-VlTF8MQk1fM6mLnBtQ/edit?usp=sharing
-  <img src="https://github.com/user-attachments/assets/ca71f513-0027-4d87-bb22-ba4f1e7bcaf2" style="width:600px; height:auto;">
+  <img src="https://github.com/user-attachments/assets/9d0f2b97-2f82-48d6-8008-f292809102d8" style="width:600px; height:auto;">
 </p>
   
 # Files 
@@ -39,7 +39,6 @@ Coming soon (ish)
 
 #  TODO
 
-- Add Camera to BOM
 - Finalize camera mounting solution
 - Start coding base functionality
 - Start coding VR → Arm Pose in Unity

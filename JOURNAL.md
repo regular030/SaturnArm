@@ -4,7 +4,7 @@ author: "Kunshpreet"
 description: "Development log for a VR-controlled robotic arm project"
 ---
 
-**Total time spent thus far: 56h**
+**Total time spent thus far: 66h**
 
 # May 25-26: Initial Concept and Design
 - Created idea
@@ -90,3 +90,24 @@ description: "Development log for a VR-controlled robotic arm project"
   - Start coding base functionality
   - Start coding VR → Arm Pose in Unity
 - **Total time spent: 3h**
+
+# June 2-4: Coding
+- Added rotary encoder support
+  - Encoder 1 → controls Joint 1
+  - Encoder 2 → controls Joint 2
+  - Encoder 3 → controls the claw
+  - Encoder 4 → controls base (stepper/rotation)
+- Implemented inverse kinematics with safety checks
+  - Enforces ±90° range from vertical (coded as 90°)
+  - Restricts x ∈ [-5.5, 5.5] if y ≥ -2 cm
+- Added movement validation system
+  - Only moves to reachable coordinates within the arm’s physical limits
+  - Displays an error if the point is unreachable
+- New command features
+  - Supports input like x:5,y:8,z:-2
+  - stop command halts all motors immediately
+- Maintains stable claw orientation (always facing downward)
+- TODO:
+  - Finalize camera mounting solution
+  - Start coding VR → Arm Pose in Unity
+**Total time spent: 10h**

@@ -87,4 +87,12 @@ bool parseCoordinates(const std::string& input, float& x, float& y, int& z);
 std::string read_uart_line();
 void uart_send_message(const char* message);
 
+#define SERVO_FULL_SPEED 80    // Max speed percentage (0-100)
+#define SERVO_SLOW_SPEED 30    // Slow speed for precise positioning
+#define ENC_COUNTS_PER_REV 360 // Encoder counts per full revolution
+
+// Update servo control function declaration
+void set_servo(uint pin, int speed); // speed: -100 to 100
+void stop_all_servos();
+
 #endif // ARM_CONTROL_H

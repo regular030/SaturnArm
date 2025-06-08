@@ -82,29 +82,32 @@ void init_encoders() {
     gpio_set_irq_enabled(ENC_CLAW_B, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
 }
 
+// Update encoder tracking for continuous rotation
 void update_encoder(uint gpio, uint32_t events) {
+    static uint32_t last_time = 0;
     uint32_t now = time_us_32();
-    
-    // Debounce check (1000us = 1ms)
-    if (now - last_encoder_time < 1000) return;
-    last_encoder_time = now;
+    if (now - last_time < 1000) return; // 1ms debounce
+    last_time = now;
 
-    // Determine which encoder changed
-    if (gpio == ENC_STEPPER_A || gpio == ENC_STEPPER_B) {
-        bool a = gpio_get(ENC_STEPPER_A);
-        bool b = gpio_get(ENC_STEPPER_B);
-        stepper_pos += (a ^ b) ? -1 : 1;
-    }
-    else if (gpio == ENC_BASE_A || gpio == ENC_BASE_B) {
+    // Base encoder (continuous, no wrap)
+    if (gpio == ENC_BASE_A || gpio == ENC_BASE_B) {
         bool a = gpio_get(ENC_BASE_A);
         bool b = gpio_get(ENC_BASE_B);
         base_pos += (a ^ b) ? -1 : 1;
     }
+    // Stepper encoder (Z axis, continuous)
+    else if (gpio == ENC_STEPPER_A || gpio == ENC_STEPPER_B) {
+        bool a = gpio_get(ENC_STEPPER_A);
+        bool b = gpio_get(ENC_STEPPER_B);
+        stepper_pos += (a ^ b) ? -1 : 1;
+    }
+    // Joint2 encoder (continuous)
     else if (gpio == ENC_JOINT2_A || gpio == ENC_JOINT2_B) {
         bool a = gpio_get(ENC_JOINT2_A);
         bool b = gpio_get(ENC_JOINT2_B);
         joint2_pos += (a ^ b) ? -1 : 1;
     }
+    // Claw encoder (continuous)
     else if (gpio == ENC_CLAW_A || gpio == ENC_CLAW_B) {
         bool a = gpio_get(ENC_CLAW_A);
         bool b = gpio_get(ENC_CLAW_B);
@@ -117,15 +120,26 @@ int32_t get_base_position() { return base_pos; }
 int32_t get_joint2_position() { return joint2_pos; }
 int32_t get_claw_position() { return claw_pos; }
 
-void set_servo(uint pin, int angle) {
-    angle = clamp(angle, 0, 180);
-    float min_us = 1000.0f;
-    float max_us = 2000.0f;
-    float us = min_us + ((angle / 180.0f) * (max_us - min_us));
+void set_servo(uint pin, int speed) {
+    speed = clamp(speed, -100, 100);
+    
+    float us;
+    if (speed == 0) {
+        us = 1500; // Stop pulse width
+    } else if (speed > 0) {
+        us = 1500 + 10 * speed; // 1500-2500µs for CW
+    } else {
+        us = 1500 + 10 * speed; // 500-1500µs for CCW
+    }
+    
     uint level = (uint)(us * PWM_WRAP / 20000.0f);
-    uint slice = pwm_gpio_to_slice_num(pin);
-    uint channel = pwm_gpio_to_channel(pin);
-    pwm_set_chan_level(slice, channel, level);
+    pwm_set_gpio_level(pin, level);
+}
+
+void stop_all_servos() {
+    set_servo(SERVO1_PIN, 0);
+    set_servo(SERVO2_PIN, 0);
+    set_servo(SERVO3_PIN, 0);
 }
 
 void moveStepper(int steps, bool dir) {
@@ -176,28 +190,24 @@ int radToDeg(float rad) {
 }
 
 void calibrateArm() {
-    uart_send_message("[CALIBRATION] Starting...\n");
+    uart_send_message("Calibrating - move arm to zero position manually\n");
+    uart_send_message("Then send 'done' via UART\n");
     
-    // Reset positions
-    joint1_angle = 90;
-    joint2_angle = 90;
-    z_height = 0;
-    stepper_pos = 0;
+    // Wait for user to position arm
+    while (true) {
+        std::string input = read_uart_line();
+        if (input == "done") break;
+        sleep_ms(100);
+    }
+    
+    // Reset encoder positions
     base_pos = 0;
     joint2_pos = 0;
+    stepper_pos = 0;
     claw_pos = 0;
     
-    // Move to physical position
-    set_servo(SERVO1_PIN, 90);
-    set_servo(SERVO2_PIN, 90);
-    set_servo(SERVO3_PIN, 90);
-    moveStepperToZ(0);
-    
     MAX_REACH = L1 + L2 - SAFETY_MARGIN;
-    
-    char cal_msg[50];
-    snprintf(cal_msg, sizeof(cal_msg), "CAL_DONE:%.2f\n", MAX_REACH);
-    uart_send_message(cal_msg);
+    uart_send_message("Calibration complete\n");
 }
 
 void moveTo(float x, float y, int z) {
@@ -207,29 +217,47 @@ void moveTo(float x, float y, int z) {
         return;
     }
 
-    int angle1 = radToDeg(t1);
-    int angle2 = radToDeg(t2);
+    int target_base = radToDeg(t1);
+    int target_joint2 = radToDeg(t2);
+    
+    // Calculate shortest rotational path
+    int base_move = (target_base - (base_pos % 360) + 540) % 360 - 180;
+    int joint2_move = (target_joint2 - (joint2_pos % 360) + 540) % 360 - 180;
 
-    if (angle1 < 0 || angle1 > 180 || angle2 < 0 || angle2 > 180) {
-        uart_send_message("[ERROR] Joint angle limit exceeded\n");
-        return;
+    // Determine direction and speed
+    int base_speed = base_move > 0 ? SERVO_FULL_SPEED : -SERVO_FULL_SPEED;
+    int joint2_speed = joint2_move > 0 ? SERVO_FULL_SPEED : -SERVO_FULL_SPEED;
+    
+    // Start movement
+    moveStepperToZ(z);
+    set_servo(SERVO1_PIN, base_speed);
+    set_servo(SERVO2_PIN, base_speed);
+    set_servo(SERVO3_PIN, -joint2_speed);
+
+    // Fine-tune approach
+    while (abs(base_move) > 5 || abs(joint2_move) > 5) {
+        // Reduce speed when close
+        if (abs(base_move) < 30) base_speed = base_move > 0 ? SERVO_SLOW_SPEED : -SERVO_SLOW_SPEED;
+        if (abs(joint2_move) < 30) joint2_speed = joint2_move > 0 ? SERVO_SLOW_SPEED : -SERVO_SLOW_SPEED;
+        
+        set_servo(SERVO1_PIN, base_speed);
+        set_servo(SERVO2_PIN, base_speed);
+        set_servo(SERVO3_PIN, -joint2_speed);
+
+        // Update remaining movement
+        base_move = (target_base - (base_pos % 360) + 540) % 360 - 180;
+        joint2_move = (target_joint2 - (joint2_pos % 360) + 540) % 360 - 180;
+        
+        sleep_ms(10);
     }
 
-    char pos_msg[50];
-    snprintf(pos_msg, sizeof(pos_msg), "MOVING:%.2f,%.2f,%d\n", x, y, z);
-    uart_send_message(pos_msg);
-
-    stopFlag = true; 
-    sleep_ms(20); 
-    stopFlag = false;
+    stop_all_servos();
+    joint1_angle = target_base;
+    joint2_angle = target_joint2;
     
-    moveStepperToZ(z);
-    joint1_angle = angle1;
-    joint2_angle = angle2;
-
-    set_servo(SERVO1_PIN, angle1);
-    set_servo(SERVO2_PIN, angle1);
-    set_servo(SERVO3_PIN, 180 - angle2);
+    char msg[50];
+    snprintf(msg, sizeof(msg), "Reached: %.1f,%.1f,%d\n", x, y, z);
+    uart_send_message(msg);
 }
 
 bool parseCoordinates(const std::string& input, float& x, float& y, int& z) {
@@ -297,6 +325,7 @@ int main() {
                 calibrateArm();
             } 
             else if (input == "stop") {
+                stop_all_servos();
                 stopFlag = true;
                 uart_send_message("[STOP] All movement halted\n");
             } 

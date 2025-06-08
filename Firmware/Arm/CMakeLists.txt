@@ -30,6 +30,8 @@ include(pico_sdk_import.cmake)
 
 project(Arm C CXX ASM)
 
+include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
@@ -54,6 +56,7 @@ target_link_libraries(Arm
 # Add the standard include files to the build
 target_include_directories(Arm PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
+        ${PICO_SDK_PATH}/lib/lwip/src/include
 )
 
 # Add any user requested libraries
@@ -73,3 +76,11 @@ target_link_libraries(Arm
 
 pico_add_extra_outputs(Arm)
 
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${PICO_SDK_PATH}/lib/lwip/src/include
+)
+
+target_link_libraries(${PROJECT_NAME}
+    pico_cyw43_arch_lwip_poll
+    pico_lwip_nosys
+)

@@ -32,8 +32,14 @@ description: "Development log for a VR-controlled robotic arm project"
   - Complete claw mechanism
   - Finalize bottom part
   - Design camera mount
+  
+  <br>
+  
   ![image](https://github.com/user-attachments/assets/141bd406-e212-4f33-b4ae-24a3a3206a84)
-- **Total time spent: 16h**
+
+  </br>
+  
+**Total time spent: 16h**
 
 # May 29: Structural Completion and PCB Design
 - Finished all arms + claw assembly
@@ -46,6 +52,8 @@ description: "Development log for a VR-controlled robotic arm project"
   - Fix 3D printed inserts
   - Finalize BOM
   - Begin coding
+    <br>
+
  ![image](https://github.com/user-attachments/assets/09dc60fc-7899-4b3b-9948-aef476106900)
 - **Total time spent: 6h**
 
@@ -63,6 +71,8 @@ description: "Development log for a VR-controlled robotic arm project"
   - Add/remove rotary encoder based on space
   - Update connectors: 2-pin → PSU pins, 4-pin → 6-pin
   - Find placement for TB6600 Controller
+    <br>
+
 ![image](https://github.com/user-attachments/assets/777e0cfc-fdc9-4ff2-8b4d-4ecf88cb6e45)
 ![image](https://github.com/user-attachments/assets/5618c878-ab33-4e4d-97e2-9a86875f2d1e)
 - **Total time spent: 10h**
@@ -77,6 +87,8 @@ description: "Development log for a VR-controlled robotic arm project"
   - Finalize camera mounting solution
   - Complete official BOM
   - Start coding base functionality
+      <br>
+
 ![image](https://github.com/user-attachments/assets/8f0385e3-93d8-41d8-a9c7-2c96e0afcc6f)
 
 - **Total time spent: 4h**
@@ -134,4 +146,7 @@ description: "Development log for a VR-controlled robotic arm project"
   - Connection status UI
  - TODO:
    - Find out where to put the camera :sob:
+<br>
+
+
 **Total time spent: 20h**

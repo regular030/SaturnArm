@@ -10,8 +10,10 @@
   <img src="https://github.com/user-attachments/assets/ca28bfae-66ad-4007-b9c0-13a9e16dd829" style="width:450px; height:auto;">
   <ul>
 <p align="center">
+  <br>
   BOM: https://docs.google.com/spreadsheets/d/1lf9XG99qlgez3aRTxvFln9WQ-VlTF8MQk1fM6mLnBtQ/edit?usp=sharing
-  <img src="https://github.com/user-attachments/assets/48941869-c4ec-453a-a574-f81ec711dc8a" style="width:600px; height:auto;">
+  
+  ![image](https://github.com/user-attachments/assets/b0efc2cf-ac89-4011-be87-9e59d9bb2255)
 </p>
     
 <h2> Why did I Build This?</h2>

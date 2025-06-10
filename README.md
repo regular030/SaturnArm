@@ -47,5 +47,4 @@ Coming soon (ish)
 
 #  TODO
 
-- Finalize camera mounting solution - do by June 7th
-- Start coding VR → Arm Pose in Unity - do on June 5th-6th
+- Finalize camera mounting solution - do by June

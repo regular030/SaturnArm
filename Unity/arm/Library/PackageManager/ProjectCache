@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638848512531756728
-    m_Hash: 2525326166
+      ticks: 638850381768313270
+    m_Hash: 643022335
   m_LockFileStatus:
     m_FilePath: C:/Users/kunsh/Desktop/ARM/Unity/arm/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638848512531852586
-    m_Hash: 1853664136
+      ticks: 638850381768465340
+    m_Hash: 75725818
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:
@@ -22,6 +22,64 @@ m_LocalPackages:
 m_ProjectPath: C:/Users/kunsh/Desktop/ARM/Unity/arm/Packages
 m_EditorVersion: 2022.3.38f1 (c5d5a7410213)
 m_ResolvedPackages:
+- packageId: com.endel.nativewebsocket@https://github.com/endel/NativeWebSocket.git#upm
+  testable: 0
+  isDirectDependency: 1
+  version: 1.1.5
+  source: 5
+  resolvedPath: C:\Users\kunsh\Desktop\ARM\Unity\arm\Library\PackageCache\com.endel.nativewebsocket@1d8b49b3fe
+  assetPath: Packages/com.endel.nativewebsocket
+  name: com.endel.nativewebsocket
+  displayName: Native WebSockets
+  author:
+    name: Endel Dreyer
+    email: endel.dreyer@gmail.com
+    url: https://github.com/endel/NativeWebSocket
+  category: 
+  type: 
+  description: WebSocket client for Unity - with no external dependencies (WebGL,
+    Native, Android, iOS, UWP).
+  status: 0
+  errors: []
+  versions:
+    all: []
+    compatible: []
+    recommended: 
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords:
+  - websocket
+  - websockets
+  - native websocket
+  - native websockets
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.com/endel/NativeWebSocket.git
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  fingerprint: 
 - packageId: com.unity.collab-proxy@2.8.2
   testable: 0
   isDirectDependency: 1

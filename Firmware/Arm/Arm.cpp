@@ -123,15 +123,7 @@ int32_t get_claw_position() { return claw_pos; }
 void set_servo(uint pin, int speed) {
     speed = clamp(speed, -100, 100);
     
-    float us;
-    if (speed == 0) {
-        us = 1500; // Stop pulse width
-    } else if (speed > 0) {
-        us = 1500 + 10 * speed; // 1500-2500µs for CW
-    } else {
-        us = 1500 + 10 * speed; // 500-1500µs for CCW
-    }
-    
+    float us = (speed == 0) ? 1500 : (1500 + 10 * speed);
     uint level = (uint)(us * PWM_WRAP / 20000.0f);
     pwm_set_gpio_level(pin, level);
 }

@@ -629,10 +629,15 @@ namespace UnityEngine.InputSystem
                     var newControlIndex = FindControlIndexOnBinding(bindingIndex, control);
 
                     Debug.Assert(newControlIndex != kInvalidIndex, "Could not find active control after binding resolution");
-                    #if UNITY_EDITOR
-                    if (newControlIndex != kInvalidIndex) { continue; }
-                    Debug.Assert(newControlIndex != kInvalidIndex, "Could not find active control after binding resolution");
-                    #endif
+                    if (newControlIndex != kInvalidIndex)
+                    {
+                        newActionState.phase = oldActionState.phase;
+                        newActionState.controlIndex = newControlIndex;
+                        newActionState.magnitude = oldActionState.magnitude;
+                        newActionState.interactionIndex = oldActionState.interactionIndex;
+
+                        memory.controlMagnitudes[newControlIndex] = oldActionState.magnitude;
+                    }
 
                     // Also bring over interaction states.
                     Debug.Assert(newBindingState.interactionCount == oldBindingState.interactionCount,

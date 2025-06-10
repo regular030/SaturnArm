@@ -71,7 +71,7 @@ target_link_libraries(Arm
         hardware_clocks
         hardware_pwm
         hardware_uart
-        
+        pico_multicore
         )
 
 pico_add_extra_outputs(Arm)
@@ -84,3 +84,7 @@ target_link_libraries(${PROJECT_NAME}
     pico_cyw43_arch_lwip_poll
     pico_lwip_nosys
 )
+
+find_library(MMAL_LIBRARIES mmal)
+find_library(MMAL_UTIL_LIBRARIES mmal_util)
+find_library(MMAL_CORE_LIBRARIES mmal_core)

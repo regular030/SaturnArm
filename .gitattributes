@@ -1,2 +1,22 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Disable line ending conversion for Unity files
+*.meta binary
+*.mat binary
+*.unity binary
+*.asset binary
+*.shader binary
+*.cginc binary
+*.ttf binary
+*.pdf binary
+*.rsp binary
+*.pref binary
+*.json binary
+*.png binary
+
+# Text files (allow conversion)
+*.txt text
+*.cs text
+*.md text
+
+# Enforce LF endings for cross-platform files
+.gitattributes text eol=lf
+.gitignore text eol=lf

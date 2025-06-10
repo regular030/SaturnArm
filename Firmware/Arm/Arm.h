@@ -37,7 +37,7 @@ constexpr uint ENC_CLAW_B = 11;
 constexpr float L1 = 13.7f;
 constexpr float L2 = 10.0f;
 constexpr float SAFETY_MARGIN = 1.0f;
-constexpr uint STEPS_PER_MM = 100; // Steps per millimeter for stepper
+constexpr uint STEPS_PER_MM = 100;
 
 // Global state
 extern std::atomic<bool> running;
@@ -87,12 +87,11 @@ bool parseCoordinates(const std::string& input, float& x, float& y, int& z);
 std::string read_uart_line();
 void uart_send_message(const char* message);
 
-#define SERVO_FULL_SPEED 80    // Max speed percentage (0-100)
-#define SERVO_SLOW_SPEED 30    // Slow speed for precise positioning
-#define ENC_COUNTS_PER_REV 360 // Encoder counts per full revolution
+#define SERVO_FULL_SPEED 80
+#define SERVO_SLOW_SPEED 30
+#define ENC_COUNTS_PER_REV 360
 
-// Update servo control function declaration
-void set_servo(uint pin, int speed); // speed: -100 to 100
+void set_servo(uint pin, int speed);
 void stop_all_servos();
 
-#endif // ARM_CONTROL_H
+#endif

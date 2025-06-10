@@ -4,7 +4,7 @@ author: "Kunshpreet"
 description: "Development log for a VR-controlled robotic arm project"
 ---
 
-**Total time spent thus far: 53h**
+**Total time spent thus far: 73h**
 
 # May 25-26: Initial Concept and Design
 - Created idea
@@ -111,3 +111,27 @@ description: "Development log for a VR-controlled robotic arm project"
   - Finalize camera mounting solution
   - Start coding VR → Arm Pose in Unity
 **Total time spent: 10h**
+
+# June 4-10: Coding for Pi Zero 2 W to Unity VR
+- Ported legacy code to Pico SDK environment  
+- Implemented hardware abstraction layer for:  
+  - Servo/stepper motor control  
+  - Rotary encoder feedback  
+- Verified all hardware functionality
+- Built a lightweight TCP server using lwIP 
+- Added WebSocket support for real-time control  
+- Key endpoints:  
+  | Endpoint | Function |  
+  |----------|----------|  
+  | `/move`  | Coordinate-based arm movement |  
+  | `/direct`| Raw servo control |  
+  | `/encoders` | Live position feedback |  
+  | `/camera` | MJPEG video stream (10 FPS) |
+- Unity Features:  
+  - Controller-triggered calibration  
+  - 1:1 movement mapping (VR → Physical Arm)  
+  - Real-time camera display  
+  - Connection status UI
+ - TODO:
+   - Find out where to put the camera :sob:
+**Total time spent: 20h**

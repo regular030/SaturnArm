@@ -182,6 +182,9 @@ void handle_http_request(tcp::socket socket, ArmController& arm, Camera& camera)
 }
 
 int main() {
+    Camera* dummy = nullptr;
+    dummy = new Camera(CAM_WIDTH, CAM_HEIGHT);
+
     // Skip WiFi credential retrieval
     std::cout << "Skipping WiFi credential retrieval" << std::endl;
     
@@ -200,8 +203,6 @@ int main() {
     // Create server
     net::io_context ioc;
     tcp::acceptor acceptor(ioc);
-    acceptor.bind(tcp::endpoint(net::ip::make_address("0.0.0.0"), 80));
-    acceptor.listen();
     
     std::cout << "SaturnArm control server running on port 80" << std::endl;
 

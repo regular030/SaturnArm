@@ -29,7 +29,6 @@ target_link_libraries(SaturnArm
     ${Boost_LIBRARIES}
     pigpiod_if2
     pthread
-    wiringPi
 )
 
 # Install target

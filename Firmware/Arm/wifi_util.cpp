@@ -8,27 +8,38 @@ bool WiFiUtil::get_credentials(std::string& ssid, std::string& password) {
     std::ifstream file(config_file);
     
     if (!file.is_open()) {
-        std::cerr << "Error opening WiFi config file: " << config_file << std::endl;
+        std::cerr << "ERROR: Could not open WiFi config: " << config_file << std::endl;
         return false;
     }
 
-    std::regex ssid_regex("ssid=\"([^\"]+)\"");
-    std::regex psk_regex("psk=\"([^\"]+)\"");
+    std::regex ssid_regex(R"(ssid\s*=\s*\"([^\"]+)\")");
+    std::regex psk_regex(R"(psk\s*=\s*\"([^\"]+)\")");
     std::string line;
-    bool found = false;
+    bool found_ssid = false;
+    bool found_psk = false;
 
     while (std::getline(file, line)) {
         std::smatch match;
         
-        if (std::regex_search(line, match, ssid_regex)) {
+        if (!found_ssid && std::regex_search(line, match, ssid_regex)) {
             ssid = match[1];
-            found = true;
+            found_ssid = true;
         }
-        else if (std::regex_search(line, match, psk_regex)) {
+        else if (!found_psk && std::regex_search(line, match, psk_regex)) {
             password = match[1];
+            found_psk = true;
         }
+        
+        if (found_ssid && found_psk) break;
     }
 
     file.close();
-    return found && !password.empty();
+    
+    if (!found_ssid || !found_psk) {
+        std::cerr << "ERROR: WiFi credentials not found in config file" << std::endl;
+        return false;
+    }
+    
+    std::cout << "Retrieved WiFi credentials for: " << ssid << std::endl;
+    return true;
 }

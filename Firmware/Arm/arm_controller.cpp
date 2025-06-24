@@ -1,5 +1,4 @@
 #include "arm_controller.h"
-#include <iostream>
 #include <chrono>
 #include <thread>
 
@@ -12,7 +11,10 @@ ArmController::~ArmController() {
 
 bool ArmController::init() {
     pi = pigpio_start(nullptr, nullptr);
-    if (pi < 0) return false;
+    if (pi < 0) {
+        std::cerr << "Failed to initialize pigpio" << std::endl;
+        return false;
+    }
     
     // Setup GPIO pins
     set_mode(pi, DIR_PIN, PI_OUTPUT);
@@ -38,6 +40,7 @@ bool ArmController::init() {
         callback_ex(pi, pin, EITHER_EDGE, encoder_callback, this);
     }
     
+    std::cout << "Arm controller initialized" << std::endl;
     return true;
 }
 
@@ -54,22 +57,22 @@ void ArmController::update_encoder(int gpio, int level, uint32_t tick) {
     if (gpio == ENC_BASE_A || gpio == ENC_BASE_B) {
         int a = gpio_read(pi, ENC_BASE_A);
         int b = gpio_read(pi, ENC_BASE_B);
-        base_pos += (a ^ b) ? -1 : 1;
+        base_pos += (a == b) ? -1 : 1;
     }
     else if (gpio == ENC_STEPPER_A || gpio == ENC_STEPPER_B) {
         int a = gpio_read(pi, ENC_STEPPER_A);
         int b = gpio_read(pi, ENC_STEPPER_B);
-        stepper_pos += (a ^ b) ? -1 : 1;
+        stepper_pos += (a == b) ? -1 : 1;
     }
     else if (gpio == ENC_JOINT2_A || gpio == ENC_JOINT2_B) {
         int a = gpio_read(pi, ENC_JOINT2_A);
         int b = gpio_read(pi, ENC_JOINT2_B);
-        joint2_pos += (a ^ b) ? -1 : 1;
+        joint2_pos += (a == b) ? -1 : 1;
     }
     else if (gpio == ENC_CLAW_A || gpio == ENC_CLAW_B) {
         int a = gpio_read(pi, ENC_CLAW_A);
         int b = gpio_read(pi, ENC_CLAW_B);
-        claw_pos += (a ^ b) ? -1 : 1;
+        claw_pos += (a == b) ? -1 : 1;
     }
 }
 
@@ -95,7 +98,8 @@ bool ArmController::calculate_angles(float x, float y, float& theta1, float& the
     float max_reach = L1 + L2 - SAFETY_MARGIN;
     
     if (dist > max_reach) {
-        std::cerr << "[ERROR] Exceeds max reach with safety margin\n";
+        std::cerr << "[ERROR] Exceeds max reach with safety margin (" 
+                  << max_reach << " cm)" << std::endl;
         return false;
     }
     
@@ -111,7 +115,10 @@ bool ArmController::calculate_angles(float x, float y, float& theta1, float& the
 
 void ArmController::move_to(float x, float y, int z) {
     float theta1, theta2;
-    if (!calculate_angles(x, y, theta1, theta2)) return;
+    if (!calculate_angles(x, y, theta1, theta2)) {
+        std::cerr << "Invalid target position: x=" << x << " y=" << y << std::endl;
+        return;
+    }
     
     int target_base = static_cast<int>(theta1 * 180.0f / M_PI);
     int target_joint2 = static_cast<int>(theta2 * 180.0f / M_PI);
@@ -130,21 +137,22 @@ void ArmController::move_to(float x, float y, int z) {
     set_servo_pulsewidth(pi, SERVO2_PIN, 1500 + 10 * target_base);
     set_servo_pulsewidth(pi, SERVO3_PIN, 1500 + 10 * target_joint2);
     
-    std::cout << "Moved to position: x=" << x << " y=" << y << " z=" << z << "\n";
+    std::cout << "Moved to position: x=" << x << " y=" << y << " z=" << z << std::endl;
 }
 
 void ArmController::emergency_stop() {
     set_servo_pulsewidth(pi, SERVO1_PIN, 0);
     set_servo_pulsewidth(pi, SERVO2_PIN, 0);
     set_servo_pulsewidth(pi, SERVO3_PIN, 0);
+    set_servo_pulsewidth(pi, CLAW_PIN, 0);
     running = false;
+    std::cout << "EMERGENCY STOP ACTIVATED" << std::endl;
 }
 
 void ArmController::calibrate() {
-    std::cout << "Calibrating arm...\n";
     stepper_pos = 0;
     base_pos = 0;
     joint2_pos = 0;
     claw_pos = 0;
-    std::cout << "Calibration complete\n";
+    std::cout << "Calibration complete - encoders reset" << std::endl;
 }

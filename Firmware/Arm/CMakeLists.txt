@@ -1,25 +1,36 @@
-cmake_minimum_required(VERSION 3.10)
-project(VR_Arm_Control)
+cmake_minimum_required(VERSION 3.12)
+project(SaturnArm)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Find required packages
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 
+# Include directories
 include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${OpenCV_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
 )
 
-add_executable(vr_arm_control
+# Add executable
+add_executable(SaturnArm
     server.cpp
-    camera.cpp
     arm_controller.cpp
+    camera.cpp
+    wifi_util.cpp
 )
 
-target_link_libraries(vr_arm_control
+# Link libraries
+target_link_libraries(SaturnArm
     ${OpenCV_LIBS}
     ${Boost_LIBRARIES}
-    pthread
     pigpiod_if2
+    pthread
+    wiringPi
 )
+
+# Install target
+install(TARGETS SaturnArm RUNTIME DESTINATION bin)

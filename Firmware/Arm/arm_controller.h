@@ -3,6 +3,7 @@
 #include <atomic>
 #include <thread>
 #include <cmath>
+#include <iostream>
 
 class ArmController {
 public:
@@ -34,7 +35,7 @@ private:
     const float SAFETY_MARGIN = 1.0f;
     const uint STEPS_PER_MM = 100;
     
-    // Pin Definitions
+    // Pin Definitions (Broadcom numbering)
     const int DIR_PIN = 17;
     const int STEP_PIN = 27;
     const int SERVO1_PIN = 22;

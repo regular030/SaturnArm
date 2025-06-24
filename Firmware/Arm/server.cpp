@@ -2,6 +2,7 @@
 #include "camera.h"
 #include "wifi_util.h"
 #include <boost/beast.hpp>
+#include <boost/beast/websocket.hpp>
 #include <boost/asio.hpp>
 #include <thread>
 #include <atomic>
@@ -37,8 +38,8 @@ void send_websocket_message(beast::websocket::stream<tcp::socket>& ws,
 
 void handle_websocket(tcp::socket socket, ArmController& arm, Camera& camera) {
     try {
-        beast::flat_buffer buffer;
-        websocket::stream<tcp::socket> ws{std::move(socket)};
+        beast::websocket::stream<tcp::socket> ws{std::move(socket)};
+        ws.accept();
         ws.accept();
         
         active_arm = &arm;
@@ -214,7 +215,7 @@ int main() {
             try {
                 beast::flat_buffer buffer;
                 http::request<http::string_body> req;
-                http::peek(s, buffer, req);
+                http::read(s, buffer, req);
                 
                 if (req.target() == "/camera") {
                     handle_camera_stream(std::move(s), camera);

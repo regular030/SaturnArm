@@ -5,23 +5,35 @@ Camera::Camera(int width, int height)
     : width(width), height(height) {}
 
 bool Camera::init() {
-    cap.open(0, cv::CAP_V4L2);
+    // Try multiple approaches to open camera
+    for (int i = 0; i < 5; i++) {
+        cap.open(i, cv::CAP_V4L2);  // Try different indices
+        if (cap.isOpened()) break;
+    }
+    
     if (!cap.isOpened()) {
-        std::cerr << "ERROR: Failed to open camera device" << std::endl;
+        cap.open(-1);  // Let OpenCV choose backend
+    }
+    
+    if (!cap.isOpened()) {
+        std::cerr << "ERROR: Failed to open camera after multiple attempts" << std::endl;
         return false;
     }
     
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
-    cap.set(cv::CAP_PROP_FPS, 15);
-    
-    if (!cap.isOpened()) {
-        std::cerr << "ERROR: Failed to set camera parameters" << std::endl;
-        return false;
+    // Set properties with fallbacks
+    if (!cap.set(cv::CAP_PROP_FRAME_WIDTH, width)) {
+        std::cerr << "WARNING: Failed to set width" << std::endl;
+    }
+    if (!cap.set(cv::CAP_PROP_FRAME_HEIGHT, height)) {
+        std::cerr << "WARNING: Failed to set height" << std::endl;
     }
     
+    // Check actual settings
+    double actual_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
+    double actual_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+    
+    std::cout << "Camera initialized at " << actual_width << "x" << actual_height << std::endl;
     initialized = true;
-    std::cout << "Camera initialized at " << width << "x" << height << std::endl;
     return true;
 }
 

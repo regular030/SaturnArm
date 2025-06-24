@@ -182,8 +182,14 @@ void handle_http_request(tcp::socket socket, ArmController& arm, Camera& camera)
 }
 
 int main() {
-    Camera* dummy = nullptr;
-    dummy = new Camera(CAM_WIDTH, CAM_HEIGHT);
+    class DummyCamera : public Camera {
+    public:
+        DummyCamera() : Camera(0,0) {}
+        bool init() override { return false; }
+        bool capture_frame(std::vector<uchar>&) override { return false; }
+    };
+    
+    DummyCamera dummy_camera;
 
     // Skip WiFi credential retrieval
     std::cout << "Skipping WiFi credential retrieval" << std::endl;
@@ -201,8 +207,8 @@ int main() {
     }
 
     // Create server
-    net::io_context ioc;
-    tcp::acceptor acceptor(ioc);
+    tcp::endpoint endpoint(net::ip::tcp::v4(), 80);
+    tcp::acceptor acceptor(ioc, endpoint);
     
     std::cout << "SaturnArm control server running on port 80" << std::endl;
 

@@ -182,8 +182,9 @@ void handle_http_request(tcp::socket socket, ArmController& arm, Camera& camera)
 }
 
 int main() {
-    std::cout << "Program Started!" << std::endl;
-
+    // Skip WiFi credential retrieval
+    std::cout << "Skipping WiFi credential retrieval" << std::endl;
+    
     // Initialize hardware
     ArmController arm;
     if (!arm.init()) {
@@ -198,7 +199,9 @@ int main() {
 
     // Create server
     net::io_context ioc;
-    tcp::acceptor acceptor(ioc, {tcp::v4(), 80});
+    tcp::acceptor acceptor(ioc);
+    acceptor.bind(tcp::endpoint(net::ip::make_address("0.0.0.0"), 80));
+    acceptor.listen();
     
     std::cout << "SaturnArm control server running on port 80" << std::endl;
 
@@ -208,23 +211,27 @@ int main() {
         
         std::thread([s = std::move(socket), &arm, &camera]() mutable {
             try {
+                // Create a stream wrapper for peeking
+                beast::tcp_stream stream(std::move(s));
+                
+                // Peek at the first part of the request
+                http::request_parser<http::empty_body> parser;
+                parser.eager(false);
+                
                 beast::flat_buffer buffer;
-                http::request<http::string_body> req;
+                http::read_header(stream, buffer, parser);
+                auto req = parser.get();
                 
-                // Peek to determine connection type without consuming data
-                http::peek(s, buffer, req);
-                
-                // Debug print
                 std::cout << "Connection received for: " << req.target() << std::endl;
                 
                 if (req.target() == "/camera") {
-                    handle_camera_stream(std::move(s), camera);
+                    handle_camera_stream(stream.release_socket(), camera);
                 }
                 else if (beast::websocket::is_upgrade(req)) {
-                    handle_websocket(std::move(s), arm, camera);
+                    handle_websocket(stream.release_socket(), arm, camera);
                 }
                 else {
-                    handle_http_request(std::move(s), arm, camera);
+                    handle_http_request(stream.release_socket(), arm, camera);
                 }
             }
             catch (const std::exception& e) {

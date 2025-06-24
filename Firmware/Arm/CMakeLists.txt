@@ -20,7 +20,6 @@ add_executable(SaturnArm
     server.cpp
     arm_controller.cpp
     camera.cpp
-    wifi_util.cpp
 )
 
 # Link libraries

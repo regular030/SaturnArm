@@ -1,6 +1,5 @@
 #include "arm_controller.h"
 #include "camera.h"
-#include "wifi_util.h"
 #include <boost/beast.hpp>
 #include <boost/beast/websocket.hpp>
 #include <boost/asio.hpp>
@@ -183,12 +182,7 @@ void handle_http_request(tcp::socket socket, ArmController& arm, Camera& camera)
 }
 
 int main() {
-    // Get WiFi credentials
-    std::string ssid, password;
-    if (!WiFiUtil::get_credentials(ssid, password)) {
-        std::cerr << "FATAL: Could not retrieve WiFi credentials" << std::endl;
-        return 1;
-    }
+    std::cout << "Program Started!" << std::endl;
 
     // Initialize hardware
     ArmController arm;

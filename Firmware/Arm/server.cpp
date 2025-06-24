@@ -210,7 +210,12 @@ int main() {
             try {
                 beast::flat_buffer buffer;
                 http::request<http::string_body> req;
-                http::read(s, buffer, req);
+                
+                // Peek to determine connection type without consuming data
+                http::peek(s, buffer, req);
+                
+                // Debug print
+                std::cout << "Connection received for: " << req.target() << std::endl;
                 
                 if (req.target() == "/camera") {
                     handle_camera_stream(std::move(s), camera);
@@ -222,8 +227,11 @@ int main() {
                     handle_http_request(std::move(s), arm, camera);
                 }
             }
+            catch (const std::exception& e) {
+                std::cerr << "Connection error: " << e.what() << std::endl;
+            }
             catch (...) {
-                // Ignore errors
+                std::cerr << "Unknown connection error" << std::endl;
             }
         }).detach();
     }

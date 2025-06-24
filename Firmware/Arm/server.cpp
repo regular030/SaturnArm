@@ -40,15 +40,16 @@ void handle_websocket(tcp::socket socket, ArmController& arm, Camera& camera) {
     try {
         beast::websocket::stream<tcp::socket> ws{std::move(socket)};
         ws.accept();
-        ws.accept();
         
         active_arm = &arm;
         std::cout << "WebSocket connection established" << std::endl;
         
+        beast::flat_buffer buffer;
+        
         while (running) {
             // Read message
             buffer.clear();
-            auto bytes_read = ws.read(buffer);
+            ws.read(buffer);
             std::string cmd = beast::buffers_to_string(buffer.data());
             
             // Process command

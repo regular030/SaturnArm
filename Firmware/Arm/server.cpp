@@ -185,8 +185,8 @@ int main() {
     class DummyCamera : public Camera {
     public:
         DummyCamera() : Camera(0,0) {}
-        bool init() override { return false; }
-        bool capture_frame(std::vector<uchar>&) override { return false; }
+        bool init() { return false; }
+        bool capture_frame(std::vector<uchar>&) { return false; }
     };
     
     DummyCamera dummy_camera;
@@ -207,6 +207,7 @@ int main() {
     }
 
     // Create server
+    net::io_context ioc;
     tcp::endpoint endpoint(net::ip::tcp::v4(), 80);
     tcp::acceptor acceptor(ioc, endpoint);
     

@@ -186,7 +186,7 @@ int main() {
     public:
         DummyCamera() : Camera(0, 0) {}
         bool init() override { return false; }
-        bool capture_frame(std::vector<uchar>&) override { return false; }
+        bool capture_frame(std::vector<unsigned char>&) override { return false; }
     };
 
     DummyCamera dummy_camera;

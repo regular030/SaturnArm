@@ -184,72 +184,99 @@ void handle_http_request(tcp::socket socket, ArmController& arm, Camera& camera)
 int main() {
     class DummyCamera : public Camera {
     public:
-        DummyCamera() : Camera(0,0) {}
-        bool init() { return false; }
-        bool capture_frame(std::vector<uchar>&) { return false; }
+        DummyCamera() : Camera(0, 0) {}
+        bool init() override { return false; }
+        bool capture_frame(std::vector<uchar>&) override { return false; }
     };
-    
+
     DummyCamera dummy_camera;
 
-    // Skip WiFi credential retrieval
-    std::cout << "Skipping WiFi credential retrieval" << std::endl;
-    
-    // Initialize hardware
+    std::cout << "Skipping WiFi credential retrieval\n";
+
     ArmController arm;
     if (!arm.init()) {
-        std::cerr << "FATAL: Arm initialization failed" << std::endl;
+        std::cerr << "FATAL: Arm initialization failed\n";
         return 1;
     }
 
     Camera camera(CAM_WIDTH, CAM_HEIGHT);
     if (!camera.init()) {
-        std::cerr << "WARNING: Camera initialization failed - streaming disabled" << std::endl;
+        std::cerr << "WARNING: Camera initialization failed - streaming disabled\n";
     }
 
-    // Create server
+    // Terminal command thread
+    std::thread terminal_thread([&arm]() {
+        std::string line;
+        while (running) {
+            std::cout << "> ";
+            if (!std::getline(std::cin, line)) break;
+
+            if (line == "stop") {
+                arm.emergency_stop();
+                std::cout << "Emergency stop activated.\n";
+            } else if (line == "calibrate") {
+                arm.calibrate();
+                std::cout << "Calibration complete.\n";
+            } else if (line.rfind("move:", 0) == 0) {
+                float x, y;
+                int z;
+                if (sscanf(line.c_str(), "move:%f,%f,%d", &x, &y, &z) == 3) {
+                    arm.move_to(x, y, z);
+                    std::cout << "Moving to (" << x << ", " << y << ", " << z << ")\n";
+                } else {
+                    std::cout << "Invalid move format. Use move:x,y,z\n";
+                }
+            } else if (line == "status") {
+                std::cout << "Encoders → Stepper: " << arm.get_stepper_position()
+                          << " | Base: " << arm.get_base_position()
+                          << " | Joint2: " << arm.get_joint2_position()
+                          << " | Claw: " << arm.get_claw_position() << "\n";
+            } else if (line == "exit") {
+                running = false;
+                break;
+            } else {
+                std::cout << "Unknown command.\n";
+            }
+        }
+    });
+
+    // Networking server
     net::io_context ioc;
     tcp::endpoint endpoint(net::ip::tcp::v4(), 80);
     tcp::acceptor acceptor(ioc, endpoint);
-    
-    std::cout << "SaturnArm control server running on port 80" << std::endl;
+
+    std::cout << "SaturnArm control server running on port 80\n";
 
     while (running) {
         tcp::socket socket(ioc);
         acceptor.accept(socket);
-        
+
         std::thread([s = std::move(socket), &arm, &camera]() mutable {
             try {
-                // Create a stream wrapper for peeking
                 beast::tcp_stream stream(std::move(s));
-                
-                // Peek at the first part of the request
+                beast::flat_buffer buffer;
                 http::request_parser<http::empty_body> parser;
                 parser.eager(false);
-                
-                beast::flat_buffer buffer;
                 http::read_header(stream, buffer, parser);
                 auto req = parser.get();
-                
-                std::cout << "Connection received for: " << req.target() << std::endl;
-                
+
+                std::cout << "Connection received for: " << req.target() << "\n";
+
                 if (req.target() == "/camera") {
                     handle_camera_stream(stream.release_socket(), camera);
-                }
-                else if (beast::websocket::is_upgrade(req)) {
+                } else if (beast::websocket::is_upgrade(req)) {
                     handle_websocket(stream.release_socket(), arm, camera);
-                }
-                else {
+                } else {
                     handle_http_request(stream.release_socket(), arm, camera);
                 }
-            }
-            catch (const std::exception& e) {
-                std::cerr << "Connection error: " << e.what() << std::endl;
-            }
-            catch (...) {
-                std::cerr << "Unknown connection error" << std::endl;
+            } catch (const std::exception& e) {
+                std::cerr << "Connection error: " << e.what() << "\n";
+            } catch (...) {
+                std::cerr << "Unknown connection error\n";
             }
         }).detach();
     }
-    
+
+    terminal_thread.join(); // wait for terminal thread before exiting
     return 0;
 }

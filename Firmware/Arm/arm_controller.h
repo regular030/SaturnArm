@@ -36,12 +36,12 @@ private:
     const uint STEPS_PER_MM = 100;
     
     // Pin Definitions (Broadcom numbering)
-    const int DIR_PIN = 17;
-    const int STEP_PIN = 27;
-    const int SERVO1_PIN = 22;
-    const int SERVO2_PIN = 23;
-    const int SERVO3_PIN = 24;
-    const int CLAW_PIN = 25;
+    const int DIR_PIN = 2;
+    const int STEP_PIN = 3;
+    const int SERVO1_PIN = 15;
+    const int SERVO2_PIN = 16;
+    const int SERVO3_PIN = 18;
+    const int CLAW_PIN = 17;
     
     // Encoder Pins
     const int ENC_STEPPER_A = 5;

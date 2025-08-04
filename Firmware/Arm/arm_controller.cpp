@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 
-ArmController::ArmController() : pi(-1) {}
+ArmController::ArmController() : pi(-1), calibrated(false) {}
 
 ArmController::~ArmController() {
     running = false;
@@ -124,6 +124,12 @@ void ArmController::move_to(float x, float y, int z) {
     int target_base = static_cast<int>(theta1 * 180.0f / M_PI);
     int target_joint2 = static_cast<int>(theta2 * 180.0f / M_PI);
 
+    // Clamp base angle if calibrated (±45 degrees)
+    if (calibrated) {
+        if (target_base > 45) target_base = 45;
+        if (target_base < -45) target_base = -45;
+    }
+
     std::cout << "[Move] Target angles: base=" << target_base << "°, joint2=" << target_joint2 << "°\n";
 
     // Convert Z height to steps
@@ -144,13 +150,18 @@ void ArmController::move_to(float x, float y, int z) {
     };
 
     int base_pw = clamp_pw(target_base);
+    int base_pw_mirror = 3000 - base_pw;
+    if (base_pw_mirror < 500) base_pw_mirror = 500;
+    if (base_pw_mirror > 2500) base_pw_mirror = 2500;
+
     int joint2_pw = clamp_pw(target_joint2);
 
-    std::cout << "[Move] base_pw=" << base_pw << ", joint2_pw=" << joint2_pw << "\n";
+    std::cout << "[Move] base_pw=" << base_pw << ", base_pw_mirror=" << base_pw_mirror
+              << ", joint2_pw=" << joint2_pw << "\n";
 
-    set_servo_pulsewidth(pi, SERVO1_PIN, base_pw);
-    set_servo_pulsewidth(pi, SERVO2_PIN, base_pw);
-    set_servo_pulsewidth(pi, SERVO3_PIN, joint2_pw);
+    set_servo_pulsewidth(pi, SERVO1_PIN, base_pw);         // left servo
+    set_servo_pulsewidth(pi, SERVO2_PIN, base_pw_mirror);  // right servo (mirrored)
+    set_servo_pulsewidth(pi, SERVO3_PIN, joint2_pw);       // elbow servo
 
     std::cout << "Moved to position: x=" << x << " y=" << y << " z=" << z << std::endl;
 }
@@ -169,6 +180,7 @@ void ArmController::calibrate() {
     base_pos = 0;
     joint2_pos = 0;
     claw_pos = 0;
+    calibrated = true;  // mark arm as calibrated
     std::cout << "Calibration complete - encoders reset" << std::endl;
 }
 

@@ -22,6 +22,8 @@ public:
     int get_joint2_position() const { return joint2_pos; }
     int get_claw_position() const { return claw_pos; }
     
+    bool calibrated = false;
+    
 private:
     int pi;
     std::atomic<int> stepper_pos{0};

@@ -156,3 +156,27 @@ void ArmController::calibrate() {
     claw_pos = 0;
     std::cout << "Calibration complete - encoders reset" << std::endl;
 }
+
+void ArmController::test_servos() {
+    const int min_pw = 1000;
+    const int max_pw = 2000;
+
+    std::cout << "Testing servos with min and max pulse widths..." << std::endl;
+
+    const int test_pins[] = {SERVO1_PIN, SERVO2_PIN, SERVO3_PIN, CLAW_PIN};
+
+    for (int pin : test_pins) {
+        std::cout << "Testing servo on GPIO " << pin << std::endl;
+
+        set_servo_pulsewidth(pi, pin, min_pw);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        set_servo_pulsewidth(pi, pin, max_pw);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        set_servo_pulsewidth(pi, pin, 1500);  // Reset to center
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    std::cout << "Servo test complete." << std::endl;
+}

@@ -234,6 +234,8 @@ int main() {
             } else if (line == "exit") {
                 running = false;
                 break;
+            } else if (line == "testservos") {
+                arm.test_servos();
             } else {
                 std::cout << "Unknown command.\n";
             }

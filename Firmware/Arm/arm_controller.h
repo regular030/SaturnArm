@@ -8,6 +8,7 @@
 class ArmController {
 public:
     ArmController();
+    void test_servos();
     ~ArmController();
     
     bool init();

@@ -236,6 +236,13 @@ int main() {
                 break;
             } else if (line == "testservos") {
                 arm.test_servos();
+            } else if (line.rfind("servo", 0) == 0) {
+                int servo_num, angle;
+                if (sscanf(line.c_str(), "servo%d:%d", &servo_num, &angle) == 2) {
+                    arm.set_servo_angle(servo_num, angle);
+                } else {
+                    std::cout << "Invalid format. Use: servoN:angle (e.g. servo1:90)\n";
+                }
             } else {
                 std::cout << "Unknown command.\n";
             }

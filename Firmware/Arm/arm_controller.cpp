@@ -111,6 +111,17 @@ bool ArmController::calculate_angles(float x, float y, float& theta1, float& the
     float angleC = acosf((L1*L1 + L2*L2 - dist*dist) / (2 * L1 * L2));
     theta2 = M_PI - angleC;
 
+    // Convert to degrees for comparison
+    float deg1 = theta1 * 180.0f / M_PI;
+    float deg2 = theta2 * 180.0f / M_PI;
+
+    if (deg1 < BASE_MIN_ANGLE || deg1 > BASE_MAX_ANGLE ||
+        deg2 < JOINT2_MIN_ANGLE || deg2 > JOINT2_MAX_ANGLE) {
+        std::cerr << "[IK] Angles out of bounds: base=" << deg1 
+                  << "°, joint2=" << deg2 << "°\n";
+        return false;
+    }
+
     return true;
 }
 
@@ -124,11 +135,11 @@ void ArmController::move_to(float x, float y, int z) {
     int target_base = static_cast<int>(theta1 * 180.0f / M_PI);
     int target_joint2 = static_cast<int>(theta2 * 180.0f / M_PI);
 
-    // Clamp base angle if calibrated (±45 degrees)
-    if (calibrated) {
-        if (target_base > 45) target_base = 45;
-        if (target_base < -45) target_base = -45;
-    }
+    if (target_base > BASE_MAX_ANGLE) target_base = BASE_MAX_ANGLE;
+    if (target_base < BASE_MIN_ANGLE) target_base = BASE_MIN_ANGLE;
+
+    if (target_joint2 > JOINT2_MAX_ANGLE) target_joint2 = JOINT2_MAX_ANGLE;
+    if (target_joint2 < JOINT2_MIN_ANGLE) target_joint2 = JOINT2_MIN_ANGLE;
 
     std::cout << "[Move] Target angles: base=" << target_base << "°, joint2=" << target_joint2 << "°\n";
 
@@ -206,4 +217,26 @@ void ArmController::test_servos() {
     }
 
     std::cout << "Servo test complete." << std::endl;
+}
+
+void ArmController::set_servo_angle(int servo_number, int angle) {
+    int pulse = 1500 + angle * 10;
+    if (pulse < 500) pulse = 500;
+    if (pulse > 2500) pulse = 2500;
+
+    int pin = -1;
+    switch (servo_number) {
+        case 1: pin = SERVO1_PIN; break;
+        case 2: pin = SERVO2_PIN; break;
+        case 3: pin = SERVO3_PIN; break;
+        case 4: pin = CLAW_PIN;   break;
+        default:
+            std::cerr << "[ERROR] Invalid servo number: " << servo_number << std::endl;
+            return;
+    }
+
+    std::cout << "[Servo] Setting servo" << servo_number << " to angle " << angle
+              << " → pulse width: " << pulse << "\n";
+
+    set_servo_pulsewidth(pi, pin, pulse);
 }

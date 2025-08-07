@@ -23,8 +23,7 @@ bool ArmController::init() {
     set_mode(pi, STEP_PIN, PI_OUTPUT);
 
     // Setup servos
-    setup_servo(SERVO1_PIN);
-    setup_servo(SERVO2_PIN);
+    setup_servo(SERVO2_PIN);  // skip SERVO1
     setup_servo(SERVO3_PIN);
     setup_servo(CLAW_PIN);
 
@@ -92,8 +91,9 @@ void ArmController::move_stepper(int steps, bool dir) {
     }
 }
 
-bool ArmController::calculate_angles(float x, float y, float& theta1, float& theta2) {
-    float dist = sqrtf(x * x + y * y);
+bool ArmController::calculate_angles(float x, float z, float& theta1, float& theta2) {
+    float dz = z - 22.0f;  // calibrated vertical offset
+    float dist = sqrtf(x * x + dz * dz);
     float max_reach = L1 + L2 - SAFETY_MARGIN;
 
     std::cout << "[IK] Distance to target: " << dist << " cm, Max reach: " << max_reach << " cm\n";
@@ -104,11 +104,10 @@ bool ArmController::calculate_angles(float x, float y, float& theta1, float& the
         return false;
     }
 
-    // Attempt both elbow-down and elbow-up solutions
     for (int attempt = 0; attempt < 2; ++attempt) {
         bool elbow_down = (attempt == 0);
         float angleA = acosf((L1*L1 + dist*dist - L2*L2) / (2 * L1 * dist));
-        float angleB = atan2f(y, x);
+        float angleB = atan2f(dz, x);
         float t1 = elbow_down ? (angleB - angleA) : (angleB + angleA);
 
         float angleC = acosf((L1*L1 + L2*L2 - dist*dist) / (2 * L1 * L2));
@@ -117,55 +116,37 @@ bool ArmController::calculate_angles(float x, float y, float& theta1, float& the
         float deg1 = t1 * 180.0f / static_cast<float>(M_PI);
         float deg2 = t2 * 180.0f / static_cast<float>(M_PI);
 
-        if (deg1 >= BASE_MIN_ANGLE && deg1 <= BASE_MAX_ANGLE &&
-            deg2 >= JOINT2_MIN_ANGLE && deg2 <= JOINT2_MAX_ANGLE) {
+        if (deg1 >= -90 && deg1 <= 90 && deg2 >= -90 && deg2 <= 90) {
             theta1 = t1;
             theta2 = t2;
-            std::cout << "[IK] Using " << (elbow_down ? "elbow-down" : "elbow-up")
-                      << " solution: base=" << deg1 << "°, joint2=" << deg2 << "°\n";
+            std::cout << "[IK] Elbow " << (elbow_down ? "down" : "up")
+                      << " → θ1=" << deg1 << "°, θ2=" << deg2 << "°\n";
             return true;
         }
     }
 
-    // If no valid solution, clamp angles to limits
-    std::cerr << "[WARN] No valid IK solution within limits, using clamped fallback\n";
-    float angleB = atan2f(y, x);
-    float max_angle_rad = static_cast<float>(BASE_MAX_ANGLE) * static_cast<float>(M_PI) / 180.0f;
-    float min_angle_rad = static_cast<float>(BASE_MIN_ANGLE) * static_cast<float>(M_PI) / 180.0f;
-
-    theta1 = std::max(std::min(angleB, max_angle_rad), min_angle_rad);
-    theta2 = static_cast<float>(JOINT2_MAX_ANGLE) * static_cast<float>(M_PI) / 180.0f;
-
-    return true;
+    std::cerr << "[WARN] No valid IK solution\n";
+    return false;
 }
 
-void ArmController::move_to(float x, float y, int z) {
+void ArmController::move_to(float x, float z, int /*unused_y*/) {
     float theta1, theta2;
-    if (!calculate_angles(x, y, theta1, theta2)) {
-        std::cerr << "Invalid target position: x=" << x << " y=" << y << std::endl;
+    if (!calculate_angles(x, z, theta1, theta2)) {
+        std::cerr << "Invalid target position: x=" << x << " z=" << z << std::endl;
         return;
     }
 
-    int target_base = static_cast<int>(theta1 * 180.0f / M_PI);
-    int target_joint2 = static_cast<int>(theta2 * 180.0f / M_PI);
+    int target_shoulder = static_cast<int>(theta1 * 180.0f / M_PI);
+    int target_elbow = static_cast<int>(theta2 * 180.0f / M_PI);
 
-    if (target_base > BASE_MAX_ANGLE) target_base = BASE_MAX_ANGLE;
-    if (target_base < BASE_MIN_ANGLE) target_base = BASE_MIN_ANGLE;
+    // Clamp angles
+    if (target_shoulder > 90) target_shoulder = 90;
+    if (target_shoulder < -90) target_shoulder = -90;
+    if (target_elbow > 90) target_elbow = 90;
+    if (target_elbow < -90) target_elbow = -90;
 
-    if (target_joint2 > JOINT2_MAX_ANGLE) target_joint2 = JOINT2_MAX_ANGLE;
-    if (target_joint2 < JOINT2_MIN_ANGLE) target_joint2 = JOINT2_MIN_ANGLE;
-
-    std::cout << "[Move] Target angles: base=" << target_base << "°, joint2=" << target_joint2 << "°\n";
-
-    // Convert Z height to steps
-    int target_z_steps = z * STEPS_PER_MM;
-    int current_z_steps = stepper_pos;
-    int delta_z = target_z_steps - current_z_steps;
-
-    if (delta_z != 0) {
-        std::cout << "[Move] Moving stepper by " << delta_z << " steps\n";
-        move_stepper(abs(delta_z), delta_z > 0);
-    }
+    std::cout << "[Move] Target angles: shoulder=" << target_shoulder
+              << "°, elbow=" << target_elbow << "°\n";
 
     auto clamp_pw = [](int angle) {
         int pw = 1500 + angle * 10;
@@ -174,25 +155,16 @@ void ArmController::move_to(float x, float y, int z) {
         return pw;
     };
 
-    int base_pw = clamp_pw(target_base);
-    int base_pw_mirror = 3000 - base_pw;
-    if (base_pw_mirror < 500) base_pw_mirror = 500;
-    if (base_pw_mirror > 2500) base_pw_mirror = 2500;
+    int shoulder_pw = clamp_pw(target_shoulder);
+    int elbow_pw = clamp_pw(target_elbow);
 
-    int joint2_pw = clamp_pw(target_joint2);
+    set_servo_pulsewidth(pi, SERVO2_PIN, shoulder_pw); // shoulder
+    set_servo_pulsewidth(pi, SERVO3_PIN, elbow_pw);    // elbow
 
-    std::cout << "[Move] base_pw=" << base_pw << ", base_pw_mirror=" << base_pw_mirror
-              << ", joint2_pw=" << joint2_pw << "\n";
-
-    set_servo_pulsewidth(pi, SERVO1_PIN, base_pw);         // left servo
-    set_servo_pulsewidth(pi, SERVO2_PIN, base_pw_mirror);  // right servo (mirrored)
-    set_servo_pulsewidth(pi, SERVO3_PIN, joint2_pw);       // elbow servo
-
-    std::cout << "Moved to position: x=" << x << " y=" << y << " z=" << z << std::endl;
+    std::cout << "Moved to position: x=" << x << " z=" << z << std::endl;
 }
 
 void ArmController::emergency_stop() {
-    set_servo_pulsewidth(pi, SERVO1_PIN, 0);
     set_servo_pulsewidth(pi, SERVO2_PIN, 0);
     set_servo_pulsewidth(pi, SERVO3_PIN, 0);
     set_servo_pulsewidth(pi, CLAW_PIN, 0);
@@ -205,7 +177,7 @@ void ArmController::calibrate() {
     base_pos = 0;
     joint2_pos = 0;
     claw_pos = 0;
-    calibrated = true;  // mark arm as calibrated
+    calibrated = true;
     std::cout << "Calibration complete - encoders reset" << std::endl;
 }
 
@@ -213,9 +185,9 @@ void ArmController::test_servos() {
     const int min_pw = 1000;
     const int max_pw = 2000;
 
-    std::cout << "Testing servos with min and max pulse widths..." << std::endl;
+    std::cout << "Testing servos (excluding servo1)..." << std::endl;
 
-    const int test_pins[] = {SERVO1_PIN, SERVO2_PIN, SERVO3_PIN, CLAW_PIN};
+    const int test_pins[] = {SERVO2_PIN, SERVO3_PIN, CLAW_PIN};
 
     for (int pin : test_pins) {
         std::cout << "Testing servo on GPIO " << pin << std::endl;
@@ -240,7 +212,6 @@ void ArmController::set_servo_angle(int servo_number, int angle) {
 
     int pin = -1;
     switch (servo_number) {
-        case 1: pin = SERVO1_PIN; break;
         case 2: pin = SERVO2_PIN; break;
         case 3: pin = SERVO3_PIN; break;
         case 4: pin = CLAW_PIN;   break;

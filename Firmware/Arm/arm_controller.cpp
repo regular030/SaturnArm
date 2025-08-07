@@ -114,8 +114,8 @@ bool ArmController::calculate_angles(float x, float y, float& theta1, float& the
         float angleC = acosf((L1*L1 + L2*L2 - dist*dist) / (2 * L1 * L2));
         float t2 = elbow_down ? (M_PI - angleC) : (angleC - M_PI);
 
-        float deg1 = t1 * 180.0f / M_PI;
-        float deg2 = t2 * 180.0f / M_PI;
+        float deg1 = t1 * 180.0f / static_cast<float>(M_PI);
+        float deg2 = t2 * 180.0f / static_cast<float>(M_PI);
 
         if (deg1 >= BASE_MIN_ANGLE && deg1 <= BASE_MAX_ANGLE &&
             deg2 >= JOINT2_MIN_ANGLE && deg2 <= JOINT2_MAX_ANGLE) {
@@ -130,8 +130,11 @@ bool ArmController::calculate_angles(float x, float y, float& theta1, float& the
     // If no valid solution, clamp angles to limits
     std::cerr << "[WARN] No valid IK solution within limits, using clamped fallback\n";
     float angleB = atan2f(y, x);
-    theta1 = std::max(std::min(angleB, BASE_MAX_ANGLE * M_PI / 180.0f), BASE_MIN_ANGLE * M_PI / 180.0f);
-    theta2 = JOINT2_MAX_ANGLE * M_PI / 180.0f;
+    float max_angle_rad = static_cast<float>(BASE_MAX_ANGLE) * static_cast<float>(M_PI) / 180.0f;
+    float min_angle_rad = static_cast<float>(BASE_MIN_ANGLE) * static_cast<float>(M_PI) / 180.0f;
+
+    theta1 = std::max(std::min(angleB, max_angle_rad), min_angle_rad);
+    theta2 = static_cast<float>(JOINT2_MAX_ANGLE) * static_cast<float>(M_PI) / 180.0f;
 
     return true;
 }

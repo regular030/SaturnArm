@@ -104,23 +104,34 @@ bool ArmController::calculate_angles(float x, float y, float& theta1, float& the
         return false;
     }
 
-    float angleA = acosf((L1*L1 + dist*dist - L2*L2) / (2 * L1 * dist));
-    float angleB = atan2f(y, x);
-    theta1 = angleB - angleA;
+    // Attempt both elbow-down and elbow-up solutions
+    for (int attempt = 0; attempt < 2; ++attempt) {
+        bool elbow_down = (attempt == 0);
+        float angleA = acosf((L1*L1 + dist*dist - L2*L2) / (2 * L1 * dist));
+        float angleB = atan2f(y, x);
+        float t1 = elbow_down ? (angleB - angleA) : (angleB + angleA);
 
-    float angleC = acosf((L1*L1 + L2*L2 - dist*dist) / (2 * L1 * L2));
-    theta2 = M_PI - angleC;
+        float angleC = acosf((L1*L1 + L2*L2 - dist*dist) / (2 * L1 * L2));
+        float t2 = elbow_down ? (M_PI - angleC) : (angleC - M_PI);
 
-    // Convert to degrees for comparison
-    float deg1 = theta1 * 180.0f / M_PI;
-    float deg2 = theta2 * 180.0f / M_PI;
+        float deg1 = t1 * 180.0f / M_PI;
+        float deg2 = t2 * 180.0f / M_PI;
 
-    if (deg1 < BASE_MIN_ANGLE || deg1 > BASE_MAX_ANGLE ||
-        deg2 < JOINT2_MIN_ANGLE || deg2 > JOINT2_MAX_ANGLE) {
-        std::cerr << "[IK] Angles out of bounds: base=" << deg1 
-                  << "°, joint2=" << deg2 << "°\n";
-        return false;
+        if (deg1 >= BASE_MIN_ANGLE && deg1 <= BASE_MAX_ANGLE &&
+            deg2 >= JOINT2_MIN_ANGLE && deg2 <= JOINT2_MAX_ANGLE) {
+            theta1 = t1;
+            theta2 = t2;
+            std::cout << "[IK] Using " << (elbow_down ? "elbow-down" : "elbow-up")
+                      << " solution: base=" << deg1 << "°, joint2=" << deg2 << "°\n";
+            return true;
+        }
     }
+
+    // If no valid solution, clamp angles to limits
+    std::cerr << "[WARN] No valid IK solution within limits, using clamped fallback\n";
+    float angleB = atan2f(y, x);
+    theta1 = std::max(std::min(angleB, BASE_MAX_ANGLE * M_PI / 180.0f), BASE_MIN_ANGLE * M_PI / 180.0f);
+    theta2 = JOINT2_MAX_ANGLE * M_PI / 180.0f;
 
     return true;
 }

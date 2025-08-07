@@ -63,8 +63,8 @@ private:
     static void encoder_callback(int pi, unsigned int gpio, unsigned int edge, uint32_t tick, void *userdata);
     bool calculate_angles(float x, float y, float& theta1, float& theta2);
 
-    const int BASE_MIN_ANGLE = -45;
-    const int BASE_MAX_ANGLE = 45;
+    const int BASE_MIN_ANGLE = -90;
+    const int BASE_MAX_ANGLE = 90;
 
     const int JOINT2_MIN_ANGLE = -90;
     const int JOINT2_MAX_ANGLE = 90;

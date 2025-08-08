@@ -92,15 +92,14 @@ void ArmController::move_stepper(int steps, bool dir) {
 }
 
 bool ArmController::calculate_angles(float x, float z, float& theta1, float& theta2) {
-    float dz = z - 22.0f;  // calibrated vertical offset
+    float dz = z - 22.0f;
     float dist = sqrtf(x * x + dz * dz);
     float max_reach = L1 + L2 - SAFETY_MARGIN;
 
     std::cout << "[IK] Distance to target: " << dist << " cm, Max reach: " << max_reach << " cm\n";
 
     if (dist > max_reach) {
-        std::cerr << "[ERROR] Exceeds max reach with safety margin (" 
-                  << max_reach << " cm)" << std::endl;
+        std::cerr << "[ERROR] Exceeds max reach with safety margin (" << max_reach << " cm)\n";
         return false;
     }
 
@@ -109,16 +108,16 @@ bool ArmController::calculate_angles(float x, float z, float& theta1, float& the
         float angleA = acosf((L1*L1 + dist*dist - L2*L2) / (2 * L1 * dist));
         float angleB = atan2f(dz, x);
         float t1 = elbow_down ? (angleB - angleA) : (angleB + angleA);
-
         float angleC = acosf((L1*L1 + L2*L2 - dist*dist) / (2 * L1 * L2));
         float t2 = elbow_down ? (M_PI - angleC) : (angleC - M_PI);
 
         float deg1 = t1 * 180.0f / static_cast<float>(M_PI);
         float deg2 = t2 * 180.0f / static_cast<float>(M_PI);
 
-        if (deg1 >= -90 && deg1 <= 90 && deg2 >= -90 && deg2 <= 90) {
-            theta1 = t1;
-            theta2 = t2;
+        if (deg1 >= SHOULDER_MIN_ANGLE && deg1 <= SHOULDER_MAX_ANGLE &&
+            deg2 >= ELBOW_MIN_ANGLE && deg2 <= ELBOW_MAX_ANGLE) {
+            theta1 = std::clamp(t1, SHOULDER_MIN_ANGLE * M_PI / 180.0f, SHOULDER_MAX_ANGLE * M_PI / 180.0f);
+            theta2 = std::clamp(t2, ELBOW_MIN_ANGLE * M_PI / 180.0f, ELBOW_MAX_ANGLE * M_PI / 180.0f);
             std::cout << "[IK] Elbow " << (elbow_down ? "down" : "up")
                       << " → θ1=" << deg1 << "°, θ2=" << deg2 << "°\n";
             return true;
@@ -136,8 +135,8 @@ void ArmController::move_to(float x, float z, int /*unused_y*/) {
         return;
     }
 
-    int target_shoulder = static_cast<int>(theta1 * 180.0f / M_PI);
-    int target_elbow = static_cast<int>(theta2 * 180.0f / M_PI);
+    int target_shoulder = std::clamp(static_cast<int>(theta1 * 180.0f / M_PI), SHOULDER_MIN_ANGLE, SHOULDER_MAX_ANGLE);
+    int target_elbow = std::clamp(static_cast<int>(theta2 * 180.0f / M_PI), ELBOW_MIN_ANGLE, ELBOW_MAX_ANGLE);
 
     // Clamp angles
     if (target_shoulder > 90) target_shoulder = 90;

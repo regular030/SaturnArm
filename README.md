@@ -46,12 +46,84 @@
   -  DEPRECATED
       
 <ul> </ul>
+ 
+#  Instructions
 
-#  Instructions 
-Coming soon (ish)
+## Building the Firmware on Raspberry Pi Zero 2 W
+
+**1. Install Required Packages**
+
+Open a terminal on your Pi Zero 2 W and run:
+```sh
+sudo apt update
+sudo apt install -y git cmake g++ libopencv-dev libboost-system-dev pigpio
+```
+
+**2. Clone the Repository**
+```sh
+git clone https://github.com/regular030/SaturnArm
+cd SaturnArm/Firmware/Arm
+```
+
+**3. Enable pigpio Daemon**
+```sh
+sudo systemctl enable pigpiod
+sudo systemctl start pigpiod
+```
+
+**4. Build the Firmware**
+```sh
+mkdir build
+cd build
+cmake ..
+make
+```
+The executable `SaturnArm` will be created in the `build` directory.
+
+---
+
+## Calibration
+
+Before using the arm, you must calibrate it:
+
+1. **Bring the Arm to the Calibration Position:**  
+   Physically move the arm so it is straight up (vertical position).
+
+2. **Run the Firmware:**  
+   Start the firmware executable:
+   ```sh
+   sudo ./SaturnArm
+   ```
+
+3. **Calibrate:**  
+   Use the calibration function (usually via the software interface or command) to reset all encoders.  
+   This sets the current position as "zero" for all joints.
+
+---
+
+## Main Functions
+
+- **move_to(x, z):**  
+  Move the arm to a specific (x, z) coordinate using inverse kinematics.
+
+- **set_servo_angle(servo_number, angle):**  
+  Set a specific servo (shoulder, elbow, or claw) to a given angle.
+
+- **test_servos():**  
+  Sweep all servos (except base) through their range for testing.
+
+- **emergency_stop():**  
+  Immediately stop all motion and disable servos.
+
+- **calibrate():**  
+  Reset all encoder positions to zero (should be done with the arm straight up).
+
+---
+
+For more details, see the source code in `Firmware/Arm/`.
 
 <ul> </ul>
 
 #  TODO
 
-- Finalize camera mounting solution - do by June
+- Finalize VR Support - Delayed Indefinitely

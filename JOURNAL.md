@@ -4,7 +4,7 @@ author: "Kunshpreet"
 description: "Development log for a VR-controlled robotic arm project"
 ---
 
-**Total time spent thus far: 73h**
+**Total time spent thus far: 103h**
 
 # May 25-26: Initial Concept and Design
 - Created idea
@@ -148,5 +148,29 @@ description: "Development log for a VR-controlled robotic arm project"
    - Find out where to put the camera :sob:
 <br>
 
-
 **Total time spent: 20h**
+
+# Aug 1-20: Hardware Building, Testing and Debugging
+![0](https://github.com/user-attachments/assets/63a2db90-d7f2-476f-89ab-c0e46472aff9)
+- **Failures & Issues**
+  - Burned 1 × Raspberry Pi Zero 2 W (likely due to incorrect LM2596 calibration)  
+  - 1 PCB failed due to soldering issues (not design-related)  
+  - Accidentally ordered 360° continuous rotation servos instead of 180° positional ones  
+  - Stripped the internal gear of one 180 ° servo during torque testing  
+  - Original 3D-printed gears failed under load, requiring redesign  
+
+- **Fixes & Improvements**
+  - Learned an important tip: always calibrate the LM2596 before powering sensitive boards  
+  - Fully soldered all working boards and connectors  
+  - Updated firmware with expanded debugging tools (serial logs, error states, power monitoring)  
+  - 3D printed replacement parts to strengthen gear assemblies  
+
+- **Integration & Results**
+  - Ran the PCB successfully after assembly  
+  - Verified stable communication between Raspberry Pi and motor drivers  
+  - Completed end-to-end integration of PCBs, motors, and encoders  
+  - System reached the stage of a stable working prototype  
+  - Project will be on hold until I get another 180-degree servo to implement VR support
+
+**Total time spent: 30h**
+

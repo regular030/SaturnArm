@@ -1,11 +1,9 @@
 <p align="center">
   
-  # SaturnArm - A Simple Robotic Arm Controlled by VR Hand Tracking
+  # SaturnArm - A Simple Robotic Arm
 </p>
 
 <p align="center">
-  <img width="508" height="708" alt="image" src="https://github.com/user-attachments/assets/677e78ee-16c3-4ce4-8561-532a8f3c00f5" />
-  <br>
   <img src="https://github.com/user-attachments/assets/6ea7d9c7-e56b-4559-b11c-992ef261172b" style="width:400px; height:auto;">
   <img src="https://github.com/user-attachments/assets/7ea0fa0f-be51-418e-8ee4-44945cf4e20b" style="width:330px; height:auto;">
   <img src="https://github.com/user-attachments/assets/1297ab5e-4d0a-43ef-a238-83c6aa38c8c6" style="width:356px; height:auto;">
@@ -43,6 +41,7 @@
   - All the Firmware files for the Pi Zero 2 W
 - Unity
   -  All the Files for the VR to Arm stuff in Unity 2022.3.38f1
+  -  DEPRECATED
       
 <ul> </ul>
 

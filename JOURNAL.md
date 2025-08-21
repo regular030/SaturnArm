@@ -156,7 +156,7 @@ description: "Development log for a VR-controlled robotic arm project"
   - Burned 1 × Raspberry Pi Zero 2 W (likely due to incorrect LM2596 calibration)  
   - 1 PCB failed due to soldering issues (not design-related)  
   - Accidentally ordered 360° continuous rotation servos instead of 180° positional ones  
-  - Stripped the internal gear of one 180 ° servo during torque testing  
+  - Stripped the internal gear of TWO 180 ° servo during torque testing  
   - Original 3D-printed gears failed under load, requiring redesign  
 
 - **Fixes & Improvements**

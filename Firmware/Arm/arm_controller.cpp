@@ -130,8 +130,8 @@ bool ArmController::calculate_angles(float x, float z, float& theta1, float& the
 
         if (deg1 >= SHOULDER_MIN_ANGLE && deg1 <= SHOULDER_MAX_ANGLE &&
             deg2 >= ELBOW_MIN_ANGLE && deg2 <= ELBOW_MAX_ANGLE) {
-            theta1 = std::clamp(t1, SHOULDER_MIN_ANGLE * M_PI / 180.0f, SHOULDER_MAX_ANGLE * M_PI / 180.0f);
-            theta2 = std::clamp(t2, ELBOW_MIN_ANGLE * M_PI / 180.0f, ELBOW_MAX_ANGLE * M_PI / 180.0f);
+            theta1 = std::clamp(t1, static_cast<float>(SHOULDER_MIN_ANGLE) * static_cast<float>(M_PI) / 180.0f, static_cast<float>(SHOULDER_MAX_ANGLE) * static_cast<float>(M_PI) / 180.0f);
+            theta2 = std::clamp(t2, static_cast<float>(ELBOW_MIN_ANGLE) * static_cast<float>(M_PI) / 180.0f, static_cast<float>(ELBOW_MAX_ANGLE) * static_cast<float>(M_PI) / 180.0f);
             std::cout << "[IK] Elbow " << (elbow_down ? "down" : "up")
                       << " → θ1=" << deg1 << "°, θ2=" << deg2 << "°\n";
             return true;

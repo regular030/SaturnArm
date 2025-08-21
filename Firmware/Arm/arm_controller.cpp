@@ -3,6 +3,20 @@
 #include <thread>
 #include <cmath>
 #include <iostream>
+#include <algorithm> // for std::clamp
+
+#ifndef SHOULDER_MIN_ANGLE
+#define SHOULDER_MIN_ANGLE -90
+#endif
+#ifndef SHOULDER_MAX_ANGLE
+#define SHOULDER_MAX_ANGLE 90
+#endif
+#ifndef ELBOW_MIN_ANGLE
+#define ELBOW_MIN_ANGLE -90
+#endif
+#ifndef ELBOW_MAX_ANGLE
+#define ELBOW_MAX_ANGLE 90
+#endif
 
 ArmController::ArmController() : pi(-1), calibrated(false) {}
 

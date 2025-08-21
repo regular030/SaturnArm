@@ -42,8 +42,8 @@ private:
     // Pin Definitions (Broadcom numbering)
     const int DIR_PIN = 2;
     const int STEP_PIN = 3;
-    const int SERVO1_PIN = 16;
-    const int SERVO2_PIN = 15;
+    const int SERVO1_PIN = 15;
+    const int SERVO2_PIN = 16;
     const int SERVO3_PIN = 18;
     const int CLAW_PIN = 17;
     

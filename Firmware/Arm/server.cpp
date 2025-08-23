@@ -218,13 +218,12 @@ int main() {
                 arm.calibrate();
                 std::cout << "Calibration complete.\n";
             } else if (line.rfind("move:", 0) == 0) {
-                float x, y;
-                int z;
-                if (sscanf(line.c_str(), "move:%f,%f,%d", &x, &y, &z) == 3) {
-                    arm.move_to(x, y, z);
-                    std::cout << "Moving to (" << x << ", " << y << ", " << z << ")\n";
+                float x, z;
+                if (sscanf(line.c_str(), "move:%f,%f", &x, &z) == 2) {
+                    arm.move_to(x, z);
+                    std::cout << "Moving to (" << x << ", " << z << ")\n";
                 } else {
-                    std::cout << "Invalid move format. Use move:x,y,z\n";
+                    std::cout << "Invalid move format. Use move:x,z\n";
                 }
             } else if (line == "status") {
                 std::cout << "Encoders → Stepper: " << arm.get_stepper_position()

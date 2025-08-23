@@ -105,76 +105,53 @@ void ArmController::move_stepper(int steps, bool dir) {
     }
 }
 
-bool ArmController::calculate_angles(float x, float z, float& theta1, float& theta2) {
-    float dz = z - 22.0f;
-    float dist = sqrtf(x * x + dz * dz);
-    float max_reach = L1 + L2 - SAFETY_MARGIN;
+bool ArmController::calculate_angles(float x, float z,
+                                     float& theta_base, float& theta_elbow) {
+    // Base rotation
+    theta_base = atan2f(z, x);
 
-    std::cout << "[IK] Distance to target: " << dist << " cm, Max reach: " << max_reach << " cm\n";
+    // Project to plane
+    float r = sqrtf(x*x + z*z);
+    float dz = z;
 
-    if (dist > max_reach) {
-        std::cerr << "[ERROR] Exceeds max reach with safety margin (" << max_reach << " cm)\n";
-        return false;
-    }
+    float dist = sqrtf(r*r + dz*dz);
+    float L1 = 13.7f;
+    float L2 = 10.0f;
 
-    for (int attempt = 0; attempt < 2; ++attempt) {
-        bool elbow_down = (attempt == 0);
-        float angleA = acosf((L1*L1 + dist*dist - L2*L2) / (2 * L1 * dist));
-        float angleB = atan2f(dz, x);
-        float t1 = elbow_down ? (angleB - angleA) : (angleB + angleA);
-        float angleC = acosf((L1*L1 + L2*L2 - dist*dist) / (2 * L1 * L2));
-        float t2 = elbow_down ? (M_PI - angleC) : (angleC - M_PI);
+    // Check reach
+    if (dist > L1 + L2 || dist < fabs(L1 - L2)) return false;
 
-        float deg1 = t1 * 180.0f / static_cast<float>(M_PI);
-        float deg2 = t2 * 180.0f / static_cast<float>(M_PI);
+    // Law of cosines
+    float cos_theta2 = (r*r + dz*dz - L1*L1 - L2*L2) / (2 * L1 * L2);
+    float theta2 = acosf(std::clamp(cos_theta2, -1.0f, 1.0f)); // elbow down
+    float theta1 = atan2f(dz, r) - atan2f(L2*sinf(theta2), L1 + L2*cosf(theta2));
 
-        if (deg1 >= SHOULDER_MIN_ANGLE && deg1 <= SHOULDER_MAX_ANGLE &&
-            deg2 >= ELBOW_MIN_ANGLE && deg2 <= ELBOW_MAX_ANGLE) {
-            theta1 = std::clamp(t1, static_cast<float>(SHOULDER_MIN_ANGLE) * static_cast<float>(M_PI) / 180.0f, static_cast<float>(SHOULDER_MAX_ANGLE) * static_cast<float>(M_PI) / 180.0f);
-            theta2 = std::clamp(t2, static_cast<float>(ELBOW_MIN_ANGLE) * static_cast<float>(M_PI) / 180.0f, static_cast<float>(ELBOW_MAX_ANGLE) * static_cast<float>(M_PI) / 180.0f);
-            std::cout << "[IK] Elbow " << (elbow_down ? "down" : "up")
-                      << " → θ1=" << deg1 << "°, θ2=" << deg2 << "°\n";
-            return true;
-        }
-    }
+    // Convert to degrees and clamp
+    theta_base  = std::clamp(theta_base, -90.0f * M_PI/180.0f, 90.0f * M_PI/180.0f);
+    theta_elbow = std::clamp(theta1, -90.0f * M_PI/180.0f, 90.0f * M_PI/180.0f);
 
-    std::cerr << "[WARN] No valid IK solution\n";
-    return false;
+    return true;
 }
 
-void ArmController::move_to(float x, float z, int /*unused_y*/) {
-    float theta1, theta2;
-    if (!calculate_angles(x, z, theta1, theta2)) {
-        std::cerr << "Invalid target position: x=" << x << " z=" << z << std::endl;
+void ArmController::move_to(float x, float z) {
+    float theta_base, theta_elbow;
+    if (!calculate_angles(x, z, theta_base, theta_elbow)) {
+        std::cerr << "Target unreachable\n";
         return;
     }
 
-    int target_shoulder = std::clamp(static_cast<int>(theta1 * 180.0f / M_PI), SHOULDER_MIN_ANGLE, SHOULDER_MAX_ANGLE);
-    int target_elbow = std::clamp(static_cast<int>(theta2 * 180.0f / M_PI), ELBOW_MIN_ANGLE, ELBOW_MAX_ANGLE);
-
-    // Clamp angles
-    if (target_shoulder > 90) target_shoulder = 90;
-    if (target_shoulder < -90) target_shoulder = -90;
-    if (target_elbow > 90) target_elbow = 90;
-    if (target_elbow < -90) target_elbow = -90;
-
-    std::cout << "[Move] Target angles: shoulder=" << target_shoulder
-              << "°, elbow=" << target_elbow << "°\n";
-
-    auto clamp_pw = [](int angle) {
-        int pw = 1500 + angle * 10;
-        if (pw < 500) pw = 500;
-        if (pw > 2500) pw = 2500;
-        return pw;
+    auto clamp_pw = [](int angle){
+        int pw = 1500 + angle*10;
+        return std::clamp(pw, 500, 2500);
     };
 
-    int shoulder_pw = clamp_pw(target_shoulder);
-    int elbow_pw = clamp_pw(target_elbow);
+    int base_deg  = (int)(theta_base * 180.0f / M_PI);
+    int elbow_deg = (int)(theta_elbow * 180.0f / M_PI);
 
-    set_servo_pulsewidth(pi, SERVO2_PIN, shoulder_pw); // shoulder
-    set_servo_pulsewidth(pi, SERVO3_PIN, elbow_pw);    // elbow
+    set_servo_pulsewidth(pi, SERVO1_PIN, clamp_pw(base_deg));
+    set_servo_pulsewidth(pi, SERVO2_PIN, clamp_pw(elbow_deg));
 
-    std::cout << "Moved to position: x=" << x << " z=" << z << std::endl;
+    std::cout << "[Move] base=" << base_deg << "°, elbow=" << elbow_deg << "°\n";
 }
 
 void ArmController::emergency_stop() {

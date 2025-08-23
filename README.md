@@ -86,8 +86,8 @@ The executable `SaturnArm` will be created in the `build` directory.
 
 Before using the arm, you must calibrate it:
 
-1. **Bring the Arm to the Calibration Position:**  
-   Physically move the arm so it is straight up (vertical position).
+1. **Remove the Motors:**  
+   Remove the motors from the arm.
 
 2. **Run the Firmware:**  
    Start the firmware executable:
@@ -95,9 +95,8 @@ Before using the arm, you must calibrate it:
    sudo ./SaturnArm
    ```
 
-3. **Calibrate:**  
-   Use the calibration function (usually via the software interface or command) to reset all encoders.  
-   This sets the current position as "zero" for all joints.
+3. **Wait for Program to Run:**  
+   Wait for the Program to run, after that wait for the motors to move to 0deg. Once the motors are done moving, make sure the arms are in an upright position before attaching the motors.
 
 ---
 

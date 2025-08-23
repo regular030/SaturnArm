@@ -104,19 +104,24 @@ Before using the arm, you must calibrate it:
 
 - **move_to(x, z):**  
   Move the arm to a specific (x, z) coordinate using inverse kinematics.
+     ```sh
+   move:(x),(y)
+   ```
 
 - **set_servo_angle(servo_number, angle):**  
   Set a specific servo (shoulder, elbow, or claw) to a given angle.
+     ```sh
+   servo(number):deg
+   ```
 
 - **test_servos():**  
   Sweep all servos (except base) through their range for testing.
 
 - **emergency_stop():**  
   Immediately stop all motion and disable servos.
-
-- **calibrate():**  
-  Reset all encoder positions to zero (should be done with the arm straight up).
-
+  ```sh
+   stop
+   ```
 ---
 
 For more details, see the source code in `Firmware/Arm/`.

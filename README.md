@@ -111,7 +111,7 @@ Before using the arm, you must calibrate it:
 - **set_servo_angle(servo_number, angle):**  
   Set a specific servo (shoulder, elbow, or claw) to a given angle.
      ```sh
-   servo(number):deg
+   servo(number):(deg)
    ```
 
 - **test_servos():**  

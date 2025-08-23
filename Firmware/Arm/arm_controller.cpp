@@ -171,3 +171,12 @@ void ArmController::set_servo_angle(int servo_number, int angle) {
     set_servo_pulsewidth(pi, pin, pulse);
     std::cout << "[Servo] Servo" << servo_number << " → pulse: " << pulse << "\n";
 }
+
+void ArmController::calibrate() {
+    stepper_pos = 0;
+    base_pos = 0;
+    joint2_pos = 0;
+    claw_pos = 0;
+    calibrated = true;
+    std::cout << "Calibration complete - encoders reset" << std::endl;
+}

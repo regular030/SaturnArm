@@ -281,7 +281,7 @@ int main() {
     //             std::cerr << "Unknown connection error\n";
     //         }
     //     }).detach();
-    // }
+    }
 
     terminal_thread.join(); // wait for terminal thread before exiting
     return 0;

@@ -13,7 +13,7 @@ public:
     void set_servo_angle(int servo_number, int angle);
     
     bool init();
-    void move_to(float x, float y, int z);
+    void move_to(float x, float z);
     void emergency_stop();
     void calibrate();
     
@@ -61,7 +61,7 @@ private:
     void move_stepper(int steps, bool dir);
     void update_encoder(int gpio, int level, uint32_t tick);
     static void encoder_callback(int pi, unsigned int gpio, unsigned int edge, uint32_t tick, void *userdata);
-    bool calculate_angles(float x, float y, float& theta1, float& theta2);
+    bool calculate_angles(float x, float z, float& theta1, float& theta2);
 
     const int BASE_MIN_ANGLE = -90;
     const int BASE_MAX_ANGLE = 90;

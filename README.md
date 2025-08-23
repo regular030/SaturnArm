@@ -114,9 +114,6 @@ Before using the arm, you must calibrate it:
    servo(number):(deg)
    ```
 
-- **test_servos():**  
-  Sweep all servos (except base) through their range for testing.
-
 - **emergency_stop():**  
   Immediately stop all motion and disable servos.
   ```sh

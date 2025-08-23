@@ -129,7 +129,7 @@ bool ArmController::calculate_angles(float x, float z,
     // Law of cosines for elbow
     float cos_elbow = (r*r + dz*dz - L1*L1 - L2*L2) / (2*L1*L2);
     cos_elbow = std::clamp(cos_elbow, -1.0f, 1.0f);
-    theta_elbow = acosf(cos_elbow); // elbow down configuration
+    theta_elbow = acosf(cos_elbow);
 
     // Shoulder angle
     theta_base = atan2f(dz, r) - atan2f(L2*sinf(theta_elbow), L1 + L2*cosf(theta_elbow));
@@ -184,7 +184,7 @@ void ArmController::test_servos() {
 
     std::cout << "Testing servos (excluding servo1)..." << std::endl;
 
-    const int test_pins[] = {SERVO2_PIN, SERVO3_PIN, CLAW_PIN};
+    const int test_pins[] = {SERVO1_PIN, SERVO3_PIN, CLAW_PIN};
 
     for (int pin : test_pins) {
         std::cout << "Testing servo on GPIO " << pin << std::endl;

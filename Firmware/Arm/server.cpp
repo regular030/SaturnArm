@@ -53,10 +53,9 @@ void handle_websocket(tcp::socket socket, ArmController& arm, Camera& camera) {
             
             // Process command
             if (cmd.find("move:") == 0) {
-                float x, y;
-                int z;
-                if (sscanf(cmd.c_str(), "move:%f,%f,%d", &x, &y, &z) == 3) {
-                    arm.move_to(x, y, z);
+                float x, z;
+                if (sscanf(cmd.c_str(), "move:%f,%f", &x, &z) == 2) {
+                    arm.move_to(x, z);
                 }
             }
             else if (cmd == "calibrate") {
@@ -162,13 +161,12 @@ void handle_http_request(tcp::socket socket, ArmController& arm, Camera& camera)
             send_http_response(socket, http::status::ok, "text/plain", "Emergency stop activated");
         }
         else if (target.find("/move") == 0) {
-            float x = 0, y = 0;
-            int z = 0;
+            float x = 0, z = 0;
             size_t pos = target.find('?');
             if (pos != std::string::npos) {
                 std::string params = target.substr(pos + 1);
-                sscanf(params.c_str(), "x=%f&y=%f&z=%d", &x, &y, &z);
-                arm.move_to(x, y, z);
+                sscanf(params.c_str(), "x=%f&z=%f", &x, &z);
+                arm.move_to(x, z);
             }
             send_http_response(socket, http::status::ok, "text/plain", "Move command received");
         }

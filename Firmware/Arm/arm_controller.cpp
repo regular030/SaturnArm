@@ -127,8 +127,8 @@ bool ArmController::calculate_angles(float x, float z,
     float theta1 = atan2f(dz, r) - atan2f(L2*sinf(theta2), L1 + L2*cosf(theta2));
 
     // Convert to degrees and clamp
-    theta_base  = std::clamp(theta_base, -90.0f * M_PI/180.0f, 90.0f * M_PI/180.0f);
-    theta_elbow = std::clamp(theta1, -90.0f * M_PI/180.0f, 90.0f * M_PI/180.0f);
+    theta_base  = std::clamp(theta_base, -90.0f * (float)M_PI/180.0f, 90.0f * (float)M_PI/180.0f);
+    theta_elbow = std::clamp(theta_elbow, -90.0f * (float)M_PI/180.0f, 90.0f * (float)M_PI/180.0f);
 
     return true;
 }

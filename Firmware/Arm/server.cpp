@@ -180,14 +180,14 @@ void handle_http_request(tcp::socket socket, ArmController& arm, Camera& camera)
 }
 
 int main() {
-    class DummyCamera : public Camera {
-    public:
-        DummyCamera() : Camera(0, 0) {}
-        bool init() { return false; }
-        bool capture_frame(std::vector<unsigned char>&) { return false; }
-    };
+    // class DummyCamera : public Camera {
+    // public:
+    //     DummyCamera() : Camera(0, 0) {}
+    //     bool init() { return false; }
+    //     bool capture_frame(std::vector<unsigned char>&) { return false; }
+    // };
 
-    DummyCamera dummy_camera;
+    // DummyCamera dummy_camera;
 
     std::cout << "Skipping WiFi credential retrieval\n";
 
@@ -197,10 +197,10 @@ int main() {
         return 1;
     }
 
-    Camera camera(CAM_WIDTH, CAM_HEIGHT);
-    if (!camera.init()) {
-        std::cerr << "WARNING: Camera initialization failed - streaming disabled\n";
-    }
+    // Camera camera(CAM_WIDTH, CAM_HEIGHT);
+    // if (!camera.init()) {
+    //     std::cerr << "WARNING: Camera initialization failed - streaming disabled\n";
+    // }
 
     // Terminal command thread
     std::thread terminal_thread([&arm]() {
@@ -257,31 +257,31 @@ int main() {
         tcp::socket socket(ioc);
         acceptor.accept(socket);
 
-        std::thread([s = std::move(socket), &arm, &camera]() mutable {
-            try {
-                beast::tcp_stream stream(std::move(s));
-                beast::flat_buffer buffer;
-                http::request_parser<http::empty_body> parser;
-                parser.eager(false);
-                http::read_header(stream, buffer, parser);
-                auto req = parser.get();
+    //     std::thread([s = std::move(socket), &arm, &camera]() mutable {
+    //         try {
+    //             beast::tcp_stream stream(std::move(s));
+    //             beast::flat_buffer buffer;
+    //             http::request_parser<http::empty_body> parser;
+    //             parser.eager(false);
+    //             http::read_header(stream, buffer, parser);
+    //             auto req = parser.get();
 
-                std::cout << "Connection received for: " << req.target() << "\n";
+    //             std::cout << "Connection received for: " << req.target() << "\n";
 
-                if (req.target() == "/camera") {
-                    handle_camera_stream(stream.release_socket(), camera);
-                } else if (beast::websocket::is_upgrade(req)) {
-                    handle_websocket(stream.release_socket(), arm, camera);
-                } else {
-                    handle_http_request(stream.release_socket(), arm, camera);
-                }
-            } catch (const std::exception& e) {
-                std::cerr << "Connection error: " << e.what() << "\n";
-            } catch (...) {
-                std::cerr << "Unknown connection error\n";
-            }
-        }).detach();
-    }
+    //             if (req.target() == "/camera") {
+    //                 handle_camera_stream(stream.release_socket(), camera);
+    //             } else if (beast::websocket::is_upgrade(req)) {
+    //                 handle_websocket(stream.release_socket(), arm, camera);
+    //             } else {
+    //                 handle_http_request(stream.release_socket(), arm, camera);
+    //             }
+    //         } catch (const std::exception& e) {
+    //             std::cerr << "Connection error: " << e.what() << "\n";
+    //         } catch (...) {
+    //             std::cerr << "Unknown connection error\n";
+    //         }
+    //     }).detach();
+    // }
 
     terminal_thread.join(); // wait for terminal thread before exiting
     return 0;

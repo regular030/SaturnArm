@@ -148,8 +148,8 @@ void ArmController::move_to(float x, float z) {
     int base_deg  = (int)(theta_base * 180.0f / M_PI);
     int elbow_deg = (int)(theta_elbow * 180.0f / M_PI);
 
-    set_servo_pulsewidth(pi, SERVO1_PIN, clamp_pw(base_deg));
-    set_servo_pulsewidth(pi, SERVO2_PIN, clamp_pw(elbow_deg));
+    set_servo_pulsewidth(pi, SERVO2_PIN, clamp_pw(base_deg));
+    set_servo_pulsewidth(pi, SERVO3_PIN, clamp_pw(elbow_deg));
 
     std::cout << "[Move] base=" << base_deg << "°, elbow=" << elbow_deg << "°\n";
 }

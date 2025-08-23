@@ -76,7 +76,7 @@ sudo systemctl start pigpiod
 mkdir build
 cd build
 cmake ..
-make
+make -j1
 ```
 The executable `SaturnArm` will be created in the `build` directory.
 
@@ -90,7 +90,7 @@ Before using the arm, you must calibrate it:
    Remove the motors from the arm.
 
 2. **Run the Firmware:**  
-   Start the firmware executable:
+   Start the firmware executable under the build directory:
    ```sh
    sudo ./SaturnArm
    ```

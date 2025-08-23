@@ -155,14 +155,14 @@ void ArmController::move_to(float x, float z) {
     int shoulder_deg = (int)(theta_base * 180.0f / M_PI);
     int elbow_deg    = (int)(theta_elbow * 180.0f / M_PI);
 
-    set_servo_pulsewidth(pi, SERVO2_PIN, clamp_pw(shoulder_deg));
+    set_servo_pulsewidth(pi, SERVO1_PIN, clamp_pw(shoulder_deg));
     set_servo_pulsewidth(pi, SERVO3_PIN, clamp_pw(elbow_deg));
 
     std::cout << "[Move] Shoulder=" << shoulder_deg << "°, Elbow=" << elbow_deg << "°\n";
 }
 
 void ArmController::emergency_stop() {
-    set_servo_pulsewidth(pi, SERVO2_PIN, 0);
+    set_servo_pulsewidth(pi, SERVO1_PIN, 0);
     set_servo_pulsewidth(pi, SERVO3_PIN, 0);
     set_servo_pulsewidth(pi, CLAW_PIN, 0);
     running = false;
@@ -209,7 +209,7 @@ void ArmController::set_servo_angle(int servo_number, int angle) {
 
     int pin = -1;
     switch (servo_number) {
-        case 2: pin = SERVO2_PIN; break;
+        case 2: pin = SERVO1_PIN; break;
         case 3: pin = SERVO3_PIN; break;
         case 4: pin = CLAW_PIN;   break;
         default:

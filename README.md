@@ -9,12 +9,14 @@
   <img src="https://github.com/user-attachments/assets/1297ab5e-4d0a-43ef-a238-83c6aa38c8c6" style="width:356px; height:auto;">
   <img src="https://github.com/user-attachments/assets/ca28bfae-66ad-4007-b9c0-13a9e16dd829" style="width:450px; height:auto;">
   <img src="https://github.com/user-attachments/assets/63a2db90-d7f2-476f-89ab-c0e46472aff9" style="width:auto; height:264px;">
-
+  
+  [Youtube Video](https://youtu.be/AQZ1tVmb0GA)
+  
   <ul>
 <p align="center">
   <br>
   BOM: https://docs.google.com/spreadsheets/d/1lf9XG99qlgez3aRTxvFln9WQ-VlTF8MQk1fM6mLnBtQ/edit?usp=sharing
-  
+    
   ![image](https://github.com/user-attachments/assets/b0efc2cf-ac89-4011-be87-9e59d9bb2255)
 </p>
     
